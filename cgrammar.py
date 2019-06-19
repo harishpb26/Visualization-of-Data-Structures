@@ -18,7 +18,8 @@ tokens = [
    'RIGHTBRACE',
    'ASSIGN',
    'EQUAL',
-   'NEWLINE'
+   'NEWLINE',
+   'ADDR'
 ]
 
 reserved = {
@@ -66,6 +67,7 @@ t_MULT   = r'\*'
 t_DIVIDE  = r'/'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
+t_ADDR = r'\&'
 t_COMMA = r','
 t_SEMICOLON = r';'
 t_FOR = r'for'
@@ -141,11 +143,17 @@ def p_primary_expression(p):
 	primary_expression	:	expression SEMICOLON primary_expression
 						|	var_assign SEMICOLON primary_expression
 						|	var_declare SEMICOLON primary_expression
+						|	pointer_declare_without_assign SEMICOLON primary_expression
+						|	pointer_declare SEMICOLON primary_expression
+						|	pointer_assign SEMICOLON primary_expression
 						|	structure_declare primary_expression
 						|	dynamic SEMICOLON primary_expression
 						|	expression SEMICOLON 
 						|	var_assign SEMICOLON
 						|	var_declare SEMICOLON
+						|	pointer_declare_without_assign SEMICOLON
+						|	pointer_assign SEMICOLON 
+						|	pointer_declare SEMICOLON
 						|	structure_declare
 						|	dynamic SEMICOLON
 						
@@ -181,7 +189,50 @@ def p_var_assign(p):
 	else:
 		var_value[p[1]] = p[3]
 	p[0] = (p[2], p[1], p[3])
+
+def p_pointer_declare_without_assign(p):
+	'''
+	pointer_declare_without_assign : INT MULT ID
+				    | FLOAT MULT ID
+	'''
+	if(p[3] not in var_type ):
+		print("pointer ", p[3] , " of type ", p[1])
+		var_type[p[3]] = p[1]+"*"
+	else:
+		print("redefinition")
+
+def p_pointer_assign(p):
+	'''
+	pointer_assign : ID ASSIGN ADDR ID
+				   
+	'''
+	if(p[1]==p[4]):
+		print("Conflicting types")
+	elif(p[4] not in var_type):
+		print(p[4], "not declared")
+	elif(p[1] not in var_type ):
+		print(p[1], "not declared")
+	else:
+		var_value[p[1]] = "&"+p[4]
+
+
+def p_pointer_declare(p):
+	'''
+	pointer_declare : INT MULT ID ASSIGN ADDR ID
+				   | FLOAT MULT ID ASSIGN ADDR ID
+	'''
 	
+	if(p[3]==p[6]):
+		print("Conflicting types")
+	elif(p[6] not in var_type):
+		print(p[6], "not declared")
+	elif(p[3] not in var_type ):
+		print("pointer ", p[3] , " of type ", p[1])
+		var_type[p[3]] = p[1]+"*"
+		var_value[p[3]] = "&"+p[6]
+	else:
+		print("redefinition")
+
 	
 def p_dynamic(p):
 	'''
