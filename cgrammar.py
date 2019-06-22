@@ -1,6 +1,7 @@
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
+import json
 
 #tokens list specifying all of the possible tokens
 tokens = [
@@ -302,7 +303,7 @@ def p_multiplier(p):
 				|	empty
 	'''
 	
-	
+
 def p_structure_declare(p):
 	'''
 	structure_declare	:	STRUCT ID LEFTBRACE content RIGHTBRACE SEMICOLON
@@ -310,8 +311,10 @@ def p_structure_declare(p):
 	'''
 	if(p[2] not in var_type):
 		var_type[p[2]] = p[1]
+		#var_type[p[2]] = {}
+		
 	#print("This is a structure",p[2])
-	
+			
 	
 def p_content(p):
 	'''
@@ -385,7 +388,7 @@ parser = yacc.yacc()
 
 string = ''
 
-f = open("input.txt","r")
+f = open("input.c","r")
 for line in f:
 	try:
 		string += line	
@@ -395,3 +398,11 @@ parser.parse(string)
 
 print(var_type)
 print(var_value)
+
+#create json file
+with open("var_type.json","w") as f:
+	json.dump(var_type, f)
+	
+with open("var_value.json","w") as f:
+	json.dump(var_value, f)
+	
