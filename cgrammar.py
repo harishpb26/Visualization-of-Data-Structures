@@ -146,6 +146,9 @@ var_value = {}
 #dictionary of types
 var_type = {}
 
+#final dictionary containing both type and value
+values = {}
+
 def p_primary_expression(p):
 	'''
 	primary_expression	:	expression SEMICOLON primary_expression
@@ -177,11 +180,14 @@ def p_primary_expression(p):
 
 def p_var_declare_without_assign(p):
 	'''
-	var_declare	:	INT ID 
+	var_declare	:	INT ID
 				|	FLOAT ID
 	'''
-	if(p[2] not in var_type):
-		var_type[p[2]] = p[1]
+	if(p[2] not in values):
+		#var_type[p[2]] = p[1]
+		values[p[2]] = [p[1]]
+		values[p[2]].insert(1,'?')
+		
 	
 	
 def p_var_declare(p):
@@ -190,9 +196,19 @@ def p_var_declare(p):
 				|	FLOAT ID ASSIGN expression 
 	'''
 	#print("variable ", p[2], "of type ", p[1])
-	if(p[2] not in var_type):
-		var_type[p[2]] = p[1]
-	var_value[p[2]] = p[4]
+	
+
+	if(p[2] not in values):
+		#var_type[p[2]] = p[1]
+		values[p[2]] = [p[1]]
+	
+	if(isinstance(p[4],tuple)):
+		v=values[p[4][1]][1]
+		values[p[2]].insert(1,v)
+	else:
+		values[p[2]].insert(1,p[4])
+	
+		
 	
 
 def p_var_assign(p):
@@ -200,7 +216,15 @@ def p_var_assign(p):
 	var_assign	:	ID ASSIGN expression
 	
 	'''
-	var_value[p[1]] = p[3]
+	
+	if(isinstance(p[3],tuple)):
+		v=values[p[3][1]][1]
+		values[p[1]][1] = v
+	else:
+		values[p[1]][1]=p[3]
+	
+	
+	#var_value[p[1]] = p[3]
 	#p[0] = (p[2], p[1], p[3])
 
 
@@ -211,7 +235,9 @@ def p_pointer_declare_without_assign(p):
 	'''
 	
 	#print("pointer ", p[3] , " of type ", p[1])
-	var_type[p[3]] = p[1] + "*"
+	#var_type[p[3]] = p[1] + "*"
+	#values[p[3]]
+
 
 
 def p_pointer_assign(p):
@@ -237,7 +263,9 @@ def p_struct_pointer_declare(p):
 	'''
 	struct_pointer_declare	:	STRUCT ID MULT ID 
 	'''
-	var_type[p[4]] = p[2] + "*"
+	#var_type[p[4]] = p[2] + "*"
+	values[p[4]] = [p[1]+" "+p[2]]
+	values[p[4]].insert(1,var_type[p[2]])
 	
 
 def p_struct_pointer_assign(p):
@@ -245,8 +273,13 @@ def p_struct_pointer_assign(p):
 	struct_pointer_assign	:	STRUCT ID MULT ID ASSIGN ID
 				   
 	'''
-	var_type[p[4]] = p[2] + "*"
-	var_value[p[4]] = "&" + p[6]
+	#var_type[p[4]] = p[2] + "*"
+	#var_value[p[4]] = "&" + p[6]
+
+	values[p[4]] = values[p[6]]
+	
+
+
 
 
 
@@ -254,7 +287,11 @@ def p_struct_pointer_assign_dynamic(p):
 	'''
 	struct_pointer_assign_dynamic	:	STRUCT ID MULT ID ASSIGN MALLOC LPAREN size2 RPAREN 
 	'''
-	var_type[p[4]] = p[2] + "*"
+	#var_type[p[4]] = p[2] + "*"
+	values[p[4]] = [p[1]+" "+p[2]]
+	values[p[4]].insert(1,var_type[p[2]])
+
+
 
 def p_struct_assign1(p):
 	'''
@@ -263,9 +300,14 @@ def p_struct_assign1(p):
 				   | ID ARROW ID ASSIGN NULL
 				   | ID ARROW ID ASSIGN ID
 	'''
-	if(p[1] not in var_value):
-		var_value[p[1]] = dict()
-	var_value[p[1]][p[3]] = p[5]
+	if(isinstance(p[5],str) & (p[5]!='NULL')):
+		listx = list(values[p[1]][1][p[3]])
+		listx[1] = values[p[5]][1]
+		values[p[1]][1][p[3]] = tuple(listx)
+	else:
+		listx = list(values[p[1]][1][p[3]])
+		listx[1] = p[5]
+		values[p[1]][1][p[3]] = tuple(listx)
 	
 
 
@@ -330,10 +372,11 @@ def p_structure_declare(p):
 	'''
 	if(p[2] not in var_type):
 		var_type[p[2]] = dict()
-		var_type[p[2]]['type']=p[1]
+		counter=0
 		for i in det:
 			var,ty = i.split(':')
-			var_type[p[2]][var]=ty
+			var_type[p[2]][var]=(ty,'?',counter)
+			counter+=1
 		del det[:]
 		#print(det)
 	#print("This is a structure",p[2])
@@ -429,3 +472,4 @@ parser.parse(string)
 
 print(var_type)
 print(var_value)
+print(values)
