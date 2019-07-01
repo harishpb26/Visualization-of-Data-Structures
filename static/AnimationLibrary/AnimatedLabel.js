@@ -62,11 +62,11 @@ AnimatedLabel.prototype.draw = function(ctx)
 	{
 		return;
 	}
-	
-	ctx.globalAlpha = this.alpha;
-	ctx.font = '10px sans-serif';
 
-        var startingXForHighlight = this.x; 
+	ctx.globalAlpha = this.alpha;
+	ctx.font = '20px sans-serif';
+
+        var startingXForHighlight = this.x;
 
         if (this.highlightIndex >= this.label.length)
         {
@@ -78,32 +78,32 @@ AnimatedLabel.prototype.draw = function(ctx)
               this.centerWidth = ctx.measureText(this.label.substring(this.highlightIndex, this.highlightIndex+1)).width;
 	      this.highlightIndexDirty = false;
         }
-	
+
 	if (this.centering)
 	{
                 if (this.highlightIndex != -1)
                 {
 		    startingXForHighlight = this.x - this.width / 2;
                     ctx.textAlign = 'left';
-                    ctx.textBaseline   = 'middle'; 
+                    ctx.textBaseline   = 'middle';
                 }
                 else
                 {
       		    ctx.textAlign = 'center';
-                    ctx.textBaseline   = 'middle'; 
+                    ctx.textBaseline   = 'middle';
                 }
 	}
 	else
 	{
 		ctx.textAlign = 'left';
-		ctx.textBaseline   = 'top'; 
+		ctx.textBaseline   = 'top';
 	}
 	if (this.highlighted)
 	{
 	    ctx.strokeStyle = "#ffaaaa";
 	    ctx.fillStyle = "#ff0000";
 		ctx.lineWidth = this.highlightDiff;
-		ctx.strokeText(this.label, this.x, this.y);		
+		ctx.strokeText(this.label, this.x, this.y);
 		//ctx.fillText(this.label, this.x, this.y);
 	}
 	ctx.strokeStyle = this.labelColor;
@@ -114,7 +114,7 @@ AnimatedLabel.prototype.draw = function(ctx)
 	{
                 if (this.highlightIndex == -1)
                 {
-                    ctx.fillText(this.label, this.x, this.y); 
+                    ctx.fillText(this.label, this.x, this.y);
                 }
                 else
                 {
@@ -142,7 +142,7 @@ AnimatedLabel.prototype.draw = function(ctx)
 		{
 			ctx.fillText(strList[i], this.x, this.y + offset + i * 12);
 			//this.textWidth = Math.max(this.textWidth, ctx.measureText(strList[i]).width);
-		}		
+		}
 	}
 	ctx.closePath();
 }
@@ -272,48 +272,48 @@ AnimatedLabel.prototype.setHighlight = function(value)
 {
 	this.highlighted = value;
 }
-		
+
 AnimatedLabel.prototype.createUndoDelete = function()
 {
 	return new UndoDeleteLabel(this.objectID, this.label, this.x, this.y, this.centering, this.labelColor, this.layer, this.highlightIndex);
 }
-		
-		
+
+
 AnimatedLabel.prototype.centerX = function()
 {
 	if (this.centering)
 	{
 		return this.x;
 	}
-	else 
+	else
 	{
-		return this.x + this.textWidth; 
+		return this.x + this.textWidth;
 	}
-	
+
 }
-	   
+
 AnimatedLabel.prototype.centerY = function()
 {
 	if (this.centering)
 	{
 		return this.y;
 	}
-	else 
+	else
 	{
-		return this.y + 5; // 
+		return this.y + 5; //
 	}
-   
+
 }
-	   
-AnimatedLabel.prototype.top = function()	   
+
+AnimatedLabel.prototype.top = function()
 {
 	   if (this.centering)
 	   {
 		   return  this.y - 5; //TODO: Un-Hardwire
 	   }
-	   else 
+	   else
 	   {
-			return this.y;   
+			return this.y;
 	   }
 }
 
@@ -324,13 +324,13 @@ AnimatedLabel.prototype.bottom = function()
    {
 	   return  this.y + 5; // TODO: + height / 2;
    }
-   else 
+   else
    {
 	   return  this.y + 10; // TODO: + hieght;
    }
 }
-	   
-	   
+
+
 AnimatedLabel.prototype.right = function()
 {
    if (this.centering)
@@ -374,13 +374,13 @@ AnimatedLabel.prototype.setHighlightIndex = function(hlIndex)
 
 
  AnimatedLabel.prototype.getTailPointerAttachPos = function(fromX, fromY, anchorPoint)
- {			 
-	return this.getClosestCardinalPoint(fromX, fromY); 
+ {
+	return this.getClosestCardinalPoint(fromX, fromY);
  }
 
-AnimatedLabel.prototype.getHeadPointerAttachPos = function (fromX, fromY) 
+AnimatedLabel.prototype.getHeadPointerAttachPos = function (fromX, fromY)
 {
-	return this.getClosestCardinalPoint(fromX, fromY);			
+	return this.getClosestCardinalPoint(fromX, fromY);
 }
 
 AnimatedLabel.prototype.setText = function(newText, textIndex, initialWidth)
@@ -417,4 +417,3 @@ UndoDeleteLabel.prototype.undoInitialStep = function(world)
 	world.setForegroundColor(this.objectID, this.labelColor);
 	world.setLayer(this.objectID, this.layer);
 }
-

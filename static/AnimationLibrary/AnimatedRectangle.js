@@ -34,7 +34,7 @@ AnimatedRectangle = function(id, val, wth, hgt,  xJust, yJust, fillColor, edgeCo
 	this.yJustify = yJust;
 	this.label = val;
 	this.labelColor = edgeColor
-	
+
 	this.backgroundColor = fillColor;
 	this.foregroundColor = edgeColor;
 	this.labelColor = this.foregroundColor;
@@ -43,7 +43,7 @@ AnimatedRectangle = function(id, val, wth, hgt,  xJust, yJust, fillColor, edgeCo
 	this.nullPointer = false;
 	this.alpha = 1.0;
 	this.addedToScene = true;
-	
+
 }
 
 AnimatedRectangle.prototype = new AnimatedObject();
@@ -68,13 +68,13 @@ AnimatedRectangle.prototype.left = function()
 	}
 	else if (this.xJustify == "center")
 	{
-		return this.x - this.w / 2.0;   
+		return this.x - this.w / 2.0;
 	}
 	else // (this.xJustify == "right")
 	{
-		return this.x - this.w;   
+		return this.x - this.w;
 	}
-	
+
 }
 
 AnimatedRectangle.prototype.centerX = function()
@@ -107,7 +107,7 @@ AnimatedRectangle.prototype.centerY = function()
 	{
 		return this.y - this.w / 2.0;
 	}
-	
+
 }
 
 AnimatedRectangle.prototype.top = function()
@@ -118,11 +118,11 @@ AnimatedRectangle.prototype.top = function()
 	}
 	else if (this.yJustify == "center")
 	{
-		return this.y - this.h / 2.0;   
+		return this.y - this.h / 2.0;
 	}
 	else //(this.xJustify == "bottom")
 	{
-		return this.y - this.h;   
+		return this.y - this.h;
 	}
 }
 
@@ -134,11 +134,11 @@ AnimatedRectangle.prototype.bottom = function()
 	}
 	else if (this.yJustify == "center")
 	{
-		return this.y + this.h / 2.0;   
+		return this.y + this.h / 2.0;
 	}
 	else //(this.xJustify == "bottom")
 	{
-		return this.y;   
+		return this.y;
 	}
 }
 
@@ -151,18 +151,18 @@ AnimatedRectangle.prototype.right = function()
 	}
 	else if (this.xJustify == "center")
 	{
-		return this.x + this.w / 2.0;   
+		return this.x + this.w / 2.0;
 	}
 	else // (this.xJustify == "right")
 	{
-		return this.x;   
+		return this.x;
 	}
 }
 
 
 AnimatedRectangle.prototype.getHeadPointerAttachPos = function(fromX, fromY)
 {
-	return this.getClosestCardinalPoint(fromX, fromY);			
+	return this.getClosestCardinalPoint(fromX, fromY);
 }
 
 
@@ -195,14 +195,14 @@ AnimatedRectangle.prototype.draw = function(context)
 	{
 		return;
 	}
-	
+
 	var startX;
 	var startY;
 	var labelPosX;
 	var labelPosY;
-	
+
 	context.globalAlpha = this.alpha;
-	
+
 	if (this.xJustify == "left")
 	{
 		startX = this.x;
@@ -212,12 +212,12 @@ AnimatedRectangle.prototype.draw = function(context)
 	{
 		startX = this.x-this.w / 2.0;
 		labelPosX = this.x;
-		
+
 	}
 	else if (this.xJustify == "right")
 	{
 		startX = this.x-this.w;
-		labelPosX = this.x - this.w / 2.0 
+		labelPosX = this.x - this.w / 2.0
 	}
 	if (this.yJustify == "top")
 	{
@@ -228,35 +228,35 @@ AnimatedRectangle.prototype.draw = function(context)
 	{
 		startY = this.y - this.h / 2.0;
 		labelPosY = this.y;
-		
+
 	}
 	else if (this.yJustify == "bottom")
 	{
 		startY = this.y - this.h;
 		labelPosY = this.y - this.h / 2.0;
 	}
-	
+
 	context.lineWidth = 1;
-	
+
 	if (this.highlighted)
 	{
 		context.strokeStyle = "#ff0000";
 		context.fillStyle = "#ff0000";
-		
+
 		context.beginPath();
 		context.moveTo(startX - this.highlightDiff,startY- this.highlightDiff);
 		context.lineTo(startX+this.w + this.highlightDiff,startY- this.highlightDiff);
 		context.lineTo(startX+this.w+ this.highlightDiff,startY+this.h + this.highlightDiff);
 		context.lineTo(startX - this.highlightDiff,startY+this.h + this.highlightDiff);
-		context.lineTo(startX - this.highlightDiff,startY - this.highlightDiff);				
+		context.lineTo(startX - this.highlightDiff,startY - this.highlightDiff);
 		context.closePath();
 		context.stroke();
 		context.fill();
-		
+
 	}
 	context.strokeStyle = this.foregroundColor;
 	context.fillStyle = this.backgroundColor;
-	
+
 	context.beginPath();
 	context.moveTo(startX ,startY);
 	context.lineTo(startX + this.w, startY);
@@ -266,7 +266,7 @@ AnimatedRectangle.prototype.draw = function(context)
 	context.closePath();
 	context.stroke();
 	context.fill();
-	
+
 	if (this.nullPointer)
 	{
 		context.beginPath();
@@ -275,17 +275,17 @@ AnimatedRectangle.prototype.draw = function(context)
 		context.closePath();
 		context.stroke();
 	}
-	
+
 	context.fillStyle = this.labelColor;
-	
+
 	context.textAlign = 'center';
-	context.font         = '10px sans-serif';
-	context.textBaseline   = 'middle'; 
+	context.font         = '15px sans-serif';
+	context.textBaseline   = 'middle';
 	context.lineWidth = 1;
-	context.fillText(this.label, this.x, this.y); 
-	
-	
-	
+	context.fillText(this.label, this.x, this.y);
+
+
+
 }
 
 AnimatedRectangle.prototype.setText = function(newText, textIndex)
@@ -295,7 +295,7 @@ AnimatedRectangle.prototype.setText = function(newText, textIndex)
 }
 
 
-AnimatedRectangle.prototype.createUndoDelete = function() 
+AnimatedRectangle.prototype.createUndoDelete = function()
 {
 	// TODO: Add color?
 	return new UndoDeleteRectangle(this.objectID, this.label, this.x, this.y, this.w, this.h, this.xJustify, this.yJustify, this.backgroundColor, this.foregroundColor, this.highlighted, this.layer);
@@ -335,6 +335,3 @@ UndoDeleteRectangle.prototype.undoInitialStep = function(world)
 	world.setLayer(this.objectID, this.layer);
 	world.setHighlight(this.objectID, this.highlighted);
 }
-
-
-

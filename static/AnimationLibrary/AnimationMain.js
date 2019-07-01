@@ -30,10 +30,10 @@ var timer;
 var swapped = false;
 
 
-function reorderSibling(node1, node2) 
+function reorderSibling(node1, node2)
 {
     node1.parentNode.replaceChild(node1, node2);
-    node1.parentNode.insertBefore(node2, node1); 
+    node1.parentNode.insertBefore(node2, node1);
 }
 
 
@@ -102,13 +102,13 @@ var sizeButton;
 
 function returnSubmit(field, funct, maxsize, intOnly)
 {
-    
+
 	if (maxsize != undefined)
 	{
 		field.size = maxsize;
 	}
 	return function(event)
-	{       
+	{
 		var keyASCII = 0;
 		if(window.event) // IE
 		{
@@ -117,7 +117,7 @@ function returnSubmit(field, funct, maxsize, intOnly)
 		else if (event.which) // Netscape/Firefox/Opera
 		{
 			keyASCII = event.which
-		} 
+		}
 
 		if (keyASCII == 13)
 		{
@@ -126,8 +126,8 @@ function returnSubmit(field, funct, maxsize, intOnly)
 		}
         	else if (keyASCII == 59  || keyASCII == 45 || keyASCII == 46 || keyASCII == 190 || keyASCII == 173)
 		{
-		       return false;	
-		} 
+		       return false;
+		}
 		else if (maxsize != undefined && field.value.length >= maxsize ||
 				 intOnly && (keyASCII < 48 || keyASCII > 57))
 
@@ -136,9 +136,9 @@ function returnSubmit(field, funct, maxsize, intOnly)
 				return false;
 		}
 	    return true;
-		
+
 	}
-	
+
 }
 
 
@@ -169,7 +169,7 @@ function animEnded()
 	stepForwardButton.disabled = true;
 	if (skipBackButton.disabled == false && paused)
 	{
-		stepBackButton.disabled = false;		
+		stepBackButton.disabled = false;
 	}
 	objectManager.statusReport.setText("Animation Completed");
 	objectManager.statusReport.setForegroundColor("#000000");
@@ -188,10 +188,10 @@ function timeout()
 {
 	// We need to set the timeout *first*, otherwise if we
 	// try to clear it later, we get behavior we don't want ...
-    timer = setTimeout('timeout()', 30); 
+    timer = setTimeout('timeout()', 30);
 	animationManager.update();
-	objectManager.draw();	
-        
+	objectManager.draw();
+
 }
 
 
@@ -225,36 +225,36 @@ function doPlayPause()
 		playPauseBackButton.setAttribute("value", "play");
 		if (skipBackButton.disabled == false)
 		{
-			stepBackButton.disabled = false;		
+			stepBackButton.disabled = false;
 		}
-		
+
 	}
 	else
 	{
-		playPauseBackButton.setAttribute("value", "pause");	
+		playPauseBackButton.setAttribute("value", "pause");
 	}
 	animationManager.SetPaused(paused);
 }
 
 
 function addControl(type, name, location) {
-	
+
     var element = document.createElement("input");
-	
+
     element.setAttribute("type", type);
     element.setAttribute("value", name);
 
 	var tableEntry = document.createElement("td");
-	
+
 	tableEntry.appendChild(element);
-	
-	
+
+
     var controlBar = document.getElementById(tableEntry);
-	
+
     //Append the element in page (in span).
     controlBar.appendChild(element);
 	return element;
- 
+
 }
 
 function addControlToAnimationBar(type,name,containerType)
@@ -264,21 +264,21 @@ function addControlToAnimationBar(type,name,containerType)
 			containerType = "input";
 	}
 	var element = document.createElement(containerType);
-	
+
         element.setAttribute("type", type);
         element.setAttribute("value", name);
-	
-	
+
+
 	var tableEntry = document.createElement("td");
-	
+
 	tableEntry.appendChild(element);
-	
+
     var controlBar = document.getElementById("GeneralAnimationControls");
-	
+
     //Append the element in page (in span).
     controlBar.appendChild(tableEntry);
 	return element;
-	
+
 }
 
 
@@ -287,7 +287,7 @@ function initCanvas()
 	canvas =  document.getElementById("canvas");
 	objectManager = new ObjectManager();
 	animationManager = new AnimationManager(objectManager);
-	
+
 	skipBackButton = addControlToAnimationBar("Button", "Skip Back");
 	skipBackButton.onclick = animationManager.skipBack.bind(animationManager);
 	stepBackButton = addControlToAnimationBar("Button", "Step Back");
@@ -298,47 +298,47 @@ function initCanvas()
 	stepForwardButton.onclick = animationManager.step.bind(animationManager) ;
 	skipForwardButton = addControlToAnimationBar("Button", "Skip Forward");
 	skipForwardButton.onclick = animationManager.skipForward.bind(animationManager);
-	
-	
-	var element = document.createElement("div");
-	element.setAttribute("display", "inline-block");		
-	element.setAttribute("float", "left");		
 
-	
+
+	var element = document.createElement("div");
+	element.setAttribute("display", "inline-block");
+	element.setAttribute("float", "left");
+
+
 	var tableEntry = document.createElement("td");
-	
-	
+
+
     var controlBar = document.getElementById("GeneralAnimationControls");
-	
-	
-	
+
+
+
 	var newTable = document.createElement("table");
 
 	var midLevel = document.createElement("tr");
 	var bottomLevel = document.createElement("td");
 	midLevel.appendChild(bottomLevel);
 	bottomLevel.appendChild(element);
-	newTable.appendChild(midLevel);	
-	
-	
-	
+	newTable.appendChild(midLevel);
+
+
+
 	midLevel = document.createElement("tr");
 	bottomLevel = document.createElement("td");
 	bottomLevel.align = "center";
-	var txtNode = document.createTextNode("Animation Speed"); 
+	var txtNode = document.createTextNode("Animation Speed");
 	midLevel.appendChild(bottomLevel);
 	bottomLevel.appendChild(txtNode);
-	newTable.appendChild(midLevel);	
+	newTable.appendChild(midLevel);
 
-	
-	
+
+
 	tableEntry.appendChild(newTable);
-	
-	
-	
+
+
+
     //Append the element in page (in span).
     controlBar.appendChild(tableEntry);
-		
+
     //tableEntry.appendChild(element);
 
 	var speed = getCookie("VisualizationSpeed");
@@ -350,7 +350,7 @@ function initCanvas()
 	{
 		speed = parseInt(speed);
 	}
-	
+
 	$(element).slider({
 					  animate: true,
 					  value: speed,
@@ -359,13 +359,13 @@ function initCanvas()
 						setCookie("VisualizationSpeed", String(ui.value), 30);
 					  },
 					  slide : function(e, ui){
-					  animationManager.SetSpeed(ui.value); 
+					  animationManager.SetSpeed(ui.value);
 					  }
 
-					  }); 
-	
+					  });
+
 	animationManager.SetSpeed(speed);
-	
+
 	element.setAttribute("style", "width:200px");
 
 
@@ -398,11 +398,11 @@ function initCanvas()
 
 	canvas.width = width;
 	canvas.height = height;
-	
-	
-	
+
+
+
 	tableEntry = document.createElement("td");
-	txtNode = document.createTextNode(" w:"); 
+	txtNode = document.createTextNode(" w:");
 	tableEntry.appendChild(txtNode);
 	controlBar.appendChild(tableEntry);
 
@@ -411,25 +411,25 @@ function initCanvas()
 	widthEntry.size = 4;
 	widthEntry.onkeydown = this.returnSubmit(widthEntry, animationManager.changeSize.bind(animationManager), 4, true);
 
-	
+
 	tableEntry = document.createElement("td");
-	txtNode = document.createTextNode("       h:"); 
+	txtNode = document.createTextNode("       h:");
 	tableEntry.appendChild(txtNode);
 	controlBar.appendChild(tableEntry);
-	
+
 	heightEntry = addControlToAnimationBar("Text", canvas.height);
 	heightEntry.onkeydown = this.returnSubmit(heightEntry, animationManager.changeSize.bind(animationManager), 4, true);
 
 //	heightEntry.size = 4;
 	sizeButton = addControlToAnimationBar("Button", "Change Canvas Size");
-	
+
 	sizeButton.onclick = animationManager.changeSize.bind(animationManager) ;
-	
+
 
         swapButton = addControlToAnimationBar("Button", "Move Controls");
-        swapButton.onclick = swapControlDiv;	
-	
-	
+        swapButton.onclick = swapControlDiv;
+
+
 	animationManager.addListener("AnimationStarted", this, animStarted);
 	animationManager.addListener("AnimationEnded", this, this.animEnded);
 	animationManager.addListener("AnimationWaiting", this, this.animWaiting);
@@ -449,49 +449,49 @@ function AnimationManager(objectManager)
 	this.animatedObjects = objectManager;
 
 	// Control variables for stopping / starting animation
-	
+
 	this.animationPaused = false;
 	this.awaitingStep = false;
 	this.currentlyAnimating = false;
-	
-	// Array holding the code for the animation.  This is 
+
+	// Array holding the code for the animation.  This is
 	// an array of strings, each of which is an animation command
 	// currentAnimation is an index into this array
 	this.AnimationSteps = [];
 	this.currentAnimation = 0;
-	
+
 	this.previousAnimationSteps = [];
-	
+
 	// Control variables for where we are in the current animation block.
 	//  currFrame holds the frame number of the current animation block,
 	//  while animationBlockLength holds the length of the current animation
-	//  block (in frame numbers).  
+	//  block (in frame numbers).
 	this.currFrame = 0;
 	this.animationBlockLength = 0;
-	
+
 	//  The animation block that is currently running.  Array of singleAnimations
 	this.currentBlock = null;
-	
+
 	/////////////////////////////////////
-	// Variables for handling undo. 
+	// Variables for handling undo.
 	////////////////////////////////////
 	//  A stack of UndoBlock objects (subclassed, UndoBlock is an abstract base class)
 	//  each of which can undo a single animation element
 	this.undoStack = [];
 	this.doingUndo = false;
-	
+
 	// A stack containing the beginning of each animation block, as an index
 	// into the AnimationSteps array
 	this.undoAnimationStepIndices = [];
 	this.undoAnimationStepIndicesStack = [];
-	
+
 	this.animationBlockLength = 10;
 
 	this.lerp = function(from, to, percent)
 	{
 		return (to - from) * percent + from;
 	}
-	
+
 	// Pause / unpause animation
 	this.SetPaused = function(pausedValue)
 	{
@@ -501,13 +501,13 @@ function AnimationManager(objectManager)
 			this.step();
 		}
 	}
-	
+
 	// Set the speed of the animation, from 0 (slow) to 100 (fast)
 	this.SetSpeed = function(newSpeed)
 	{
 		this.animationBlockLength = Math.floor((100-newSpeed) / 2);
 	}
-	
+
 
 	this.parseBool = function(str)
 	{
@@ -528,20 +528,20 @@ function AnimationManager(objectManager)
 				return "#" + clr.substring(2);
 			}
 	}
-	
-	
+
+
 	this.changeSize = function()
 	{
-		
+
 		var width = parseInt(widthEntry.value);
 		var height = parseInt(heightEntry.value);
-		
+
 		if (width > 100)
 		{
 			canvas.width = width;
 			this.animatedObjects.width = width;
 			setCookie("VisualizationWidth", String(width), 30);
-			
+
 		}
 		if (height > 100)
 		{
@@ -551,11 +551,11 @@ function AnimationManager(objectManager)
 		}
 		width.value = canvas.width;
 		heightEntry.value = canvas.height;
-		
+
 		this.animatedObjects.draw();
-		this.fireEvent("CanvasSizeChanged",{width:canvas.width, height:canvas.height});		
+		this.fireEvent("CanvasSizeChanged",{width:canvas.width, height:canvas.height});
 	}
-	
+
 	this.startNextBlock = function()
 	{
 		this.awaitingStep = false;
@@ -569,16 +569,16 @@ function AnimationManager(objectManager)
 			clearTimeout(timer);
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
-			
+
 			return;
 		}
 		this.undoAnimationStepIndices.push(this.currentAnimation);
 
 		var foundBreak= false;
 		var anyAnimations= false;
-		
+
 		while (this.currentAnimation < this.AnimationSteps.length && !foundBreak)
-		{			
+		{
 			var nextCommand = this.AnimationSteps[this.currentAnimation].split("<;>");
 			if (nextCommand[0].toUpperCase() == "CREATECIRCLE")
 			{
@@ -592,20 +592,20 @@ function AnimationManager(objectManager)
 			}
 			else if (nextCommand[0].toUpperCase() == "CONNECT")
 			{
-				
+
 				if (nextCommand.length > 7)
 				{
-					this.animatedObjects.connectEdge(parseInt(nextCommand[1]), 
-                                                                         parseInt(nextCommand[2]), 
-                                                                         this.parseColor(nextCommand[3]), 
-                                                                         parseFloat(nextCommand[4]), 
-                                                                         this.parseBool(nextCommand[5]), 
-                                                                         nextCommand[6], 
+					this.animatedObjects.connectEdge(parseInt(nextCommand[1]),
+                                                                         parseInt(nextCommand[2]),
+                                                                         this.parseColor(nextCommand[3]),
+                                                                         parseFloat(nextCommand[4]),
+                                                                         this.parseBool(nextCommand[5]),
+                                                                         nextCommand[6],
                                                                          parseInt(nextCommand[7]));
 				}
 				else if (nextCommand.length > 6)
 				{
-					this.animatedObjects.connectEdge(parseInt(nextCommand[1]), 
+					this.animatedObjects.connectEdge(parseInt(nextCommand[1]),
                                                                          parseInt(nextCommand[2]),
                                                                          this.parseColor(nextCommand[3]),
                                                                          parseFloat(nextCommand[4]),
@@ -615,7 +615,7 @@ function AnimationManager(objectManager)
 				}
 				else if (nextCommand.length > 5)
 				{
-					this.animatedObjects.connectEdge(parseInt(nextCommand[1]), 
+					this.animatedObjects.connectEdge(parseInt(nextCommand[1]),
                                                                          parseInt(nextCommand[2]),
                                                                          this.parseColor(nextCommand[3]),
                                                                          parseFloat(nextCommand[4]),
@@ -652,7 +652,7 @@ function AnimationManager(objectManager)
                                                                          true,
                                                                          "",
                                                                          0);
-					
+
 				}
 				undoBlock.push(new UndoConnect(parseInt(nextCommand[1]), parseInt (nextCommand[2]), false));
 			}
@@ -679,7 +679,7 @@ function AnimationManager(objectManager)
 															"center",// yJustify
 															"#ffffff", // background color
 					                                        "#000000"); // foreground color
-					
+
 				}
 				if (nextCommand.length > 6)
 				{
@@ -687,13 +687,13 @@ function AnimationManager(objectManager)
 				}
 				undoBlock.push(new UndoCreate(parseInt(nextCommand[1])));
 			}
-			
+
 			else if (nextCommand[0].toUpperCase() == "MOVE")
 			{
 				var objectID = parseInt(nextCommand[1]);
-				var nextAnim =  new SingleAnimation(objectID, 
-													this.animatedObjects.getNodeX(objectID), 
-													this.animatedObjects.getNodeY(objectID), 
+				var nextAnim =  new SingleAnimation(objectID,
+													this.animatedObjects.getNodeX(objectID),
+													this.animatedObjects.getNodeY(objectID),
 													parseInt(nextCommand[2]),
 													parseInt(nextCommand[3]));
 				this.currentBlock.push(nextAnim);
@@ -702,7 +702,7 @@ function AnimationManager(objectManager)
 
 				anyAnimations = true;
 			}
-			
+
 			else if (nextCommand[0].toUpperCase() == "MOVETOALIGNRIGHT")
 			{
 				var id = parseInt(nextCommand[1]);
@@ -711,8 +711,8 @@ function AnimationManager(objectManager)
 
 
 				var nextAnim =  new SingleAnimation(id,
-								    this.animatedObjects.getNodeX(id), 
-								    this.animatedObjects.getNodeY(id), 
+								    this.animatedObjects.getNodeX(id),
+								    this.animatedObjects.getNodeY(id),
 								    newXY[0],
 								    newXY[1]);
 				this.currentBlock.push(nextAnim);
@@ -756,7 +756,7 @@ function AnimationManager(objectManager)
 			{
 				var oldAlpha = this.animatedObjects.getAlpha(parseInt(nextCommand[1]));
 				this.animatedObjects.setAlpha(parseInt(nextCommand[1]), parseFloat(nextCommand[2]));
-				undoBlock.push(new UndoSetAlpha(parseInt(nextCommand[1]), oldAlpha));					
+				undoBlock.push(new UndoSetAlpha(parseInt(nextCommand[1]), oldAlpha));
 			}
 			else if (nextCommand[0].toUpperCase() == "SETTEXT")
 			{
@@ -766,8 +766,8 @@ function AnimationManager(objectManager)
 					this.animatedObjects.setText(parseInt(nextCommand[1]), nextCommand[2], parseInt(nextCommand[3]));
 					if (oldText != undefined)
 					{
-						undoBlock.push(new UndoSetText(parseInt(nextCommand[1]), oldText, parseInt(nextCommand[3]) ));			
-					}	
+						undoBlock.push(new UndoSetText(parseInt(nextCommand[1]), oldText, parseInt(nextCommand[3]) ));
+					}
 				}
 				else
 				{
@@ -775,14 +775,14 @@ function AnimationManager(objectManager)
 					this.animatedObjects.setText(parseInt(nextCommand[1]), nextCommand[2], 0);
 					if (oldText != undefined)
 					{
-						undoBlock.push(new UndoSetText(parseInt(nextCommand[1]), oldText, 0));	
+						undoBlock.push(new UndoSetText(parseInt(nextCommand[1]), oldText, 0));
 					}
 				}
 			}
 			else if (nextCommand[0].toUpperCase() == "DELETE")
 			{
 				var objectID  = parseInt(nextCommand[1]);
-				
+
 				var i;
 				var removedEdges = this.animatedObjects.deleteIncident(objectID);
 				if (removedEdges.length > 0)
@@ -804,21 +804,21 @@ function AnimationManager(objectManager)
 				}
 				else
 				{
-					this.animatedObjects.addHighlightCircleObject(parseInt(nextCommand[1]), this.parseColor(nextCommand[2]), 20);						
+					this.animatedObjects.addHighlightCircleObject(parseInt(nextCommand[1]), this.parseColor(nextCommand[2]), 20);
 				}
 				if (nextCommand.length > 4)
 				{
 					this.animatedObjects.setNodePosition(parseInt(nextCommand[1]), parseInt(nextCommand[3]), parseInt(nextCommand[4]));
 				}
 				undoBlock.push(new UndoCreate(parseInt(nextCommand[1])));
-				
-				
+
+
 			}
 			else if (nextCommand[0].toUpperCase() == "CREATELABEL")
 			{
 				if (nextCommand.length == 6)
 				{
-					this.animatedObjects.addLabelObject(parseInt(nextCommand[1]), nextCommand[2], this.parseBool(nextCommand[5]));						
+					this.animatedObjects.addLabelObject(parseInt(nextCommand[1]), nextCommand[2], this.parseBool(nextCommand[5]));
 				}
 				else
 				{
@@ -826,7 +826,7 @@ function AnimationManager(objectManager)
 				}
 				if (nextCommand.length >= 5)
 				{
-					
+
 					this.animatedObjects.setNodePosition(parseInt(nextCommand[1]), parseFloat(nextCommand[3]), parseFloat(nextCommand[4]));
 				}
 				undoBlock.push(new UndoCreate(parseInt(nextCommand[1])));
@@ -836,7 +836,7 @@ function AnimationManager(objectManager)
 				var from = parseInt(nextCommand[1]);
 				var to = parseInt(nextCommand[2]);
 				var newColor = this.parseColor(nextCommand[3]);
-				var oldColor = this.animatedObjects.setEdgeColor(from, to, newColor);				
+				var oldColor = this.animatedObjects.setEdgeColor(from, to, newColor);
 				undoBlock.push(new UndoSetEdgeColor(from, to, oldColor));
 			}
 			else if (nextCommand[0].toUpperCase() == "SETEDGEALPHA")
@@ -844,11 +844,11 @@ function AnimationManager(objectManager)
 				var from = parseInt(nextCommand[1]);
 				var to = parseInt(nextCommand[2]);
 				var newAlpha = parseFloat(nextCommand[3]);
-				var oldAplpha = this.animatedObjects.setEdgeAlpha(from, to, newAlpha);				
+				var oldAplpha = this.animatedObjects.setEdgeAlpha(from, to, newAlpha);
 				undoBlock.push(new UndoSetEdgeAlpha(from, to, oldAplpha));
 			}
-			
-			
+
+
 			else if (nextCommand[0].toUpperCase() == "SETEDGEHIGHLIGHT")
 			{
 				var newHighlight = this.parseBool(nextCommand[3]);
@@ -869,14 +869,14 @@ function AnimationManager(objectManager)
 				this.animatedObjects.setLayer(parseInt(nextCommand[1]), parseInt(nextCommand[2]));
 				//TODO: Add undo information here
 			}
-			
-			
+
+
 			else if (nextCommand[0].toUpperCase() == "CREATELINKEDLIST")
 			{
 				if (nextCommand.length == 11)
 				{
-					this.animatedObjects.addLinkedListObject(parseInt(nextCommand[1]), nextCommand[2], 
-			               parseInt(nextCommand[3]), parseInt(nextCommand[4]), parseFloat(nextCommand[7]), 
+					this.animatedObjects.addLinkedListObject(parseInt(nextCommand[1]), nextCommand[2],
+			               parseInt(nextCommand[3]), parseInt(nextCommand[4]), parseFloat(nextCommand[7]),
 			               this.parseBool(nextCommand[8]), this.parseBool(nextCommand[9]),parseInt(nextCommand[10]), "#FFFFFF", "#000000");
 				}
 				else
@@ -888,13 +888,13 @@ function AnimationManager(objectManager)
 					this.animatedObjects.setNodePosition(parseInt(nextCommand[1]), parseInt(nextCommand[5]), parseInt(nextCommand[6]));
 					undoBlock.push(new UndoCreate(parseInt(nextCommand[1])));
 				}
-				
+
 			}
 			else if (nextCommand[0].toUpperCase() == "SETNULL")
 			{
 				var oldNull = this.animatedObjects.getNull(parseInt(nextCommand[1]));
 				this.animatedObjects.setNull(parseInt(nextCommand[1]), this.parseBool(nextCommand[2]));
-				undoBlock.push(new UndoSetNull(parseInt(nextCommand[1]), oldNull));					
+				undoBlock.push(new UndoSetNull(parseInt(nextCommand[1]), oldNull));
 			}
 			else if (nextCommand[0].toUpperCase() == "SETTEXTCOLOR")
 			{
@@ -902,21 +902,21 @@ function AnimationManager(objectManager)
 				{
 					oldColor = this.animatedObjects.getTextColor(parseInt(nextCommand[1]), parseInt(nextCommand[3]));
 					this.animatedObjects.setTextColor(parseInt(nextCommand[1]), this.parseColor(nextCommand[2]), parseInt(nextCommand[3]));
-					undoBlock.push(new UndoSetTextColor(parseInt(nextCommand[1]), oldColor, parseInt(nextCommand[3]) ));					
+					undoBlock.push(new UndoSetTextColor(parseInt(nextCommand[1]), oldColor, parseInt(nextCommand[3]) ));
 				}
 				else
 				{
 					oldColor = this.animatedObjects.getTextColor(parseInt(nextCommand[1]), 0);
 					this.animatedObjects.setTextColor(parseInt(nextCommand[1]),this.parseColor(nextCommand[2]), 0);
-					undoBlock.push(new UndoSetTextColor(parseInt(nextCommand[1]), oldColor, 0));					
+					undoBlock.push(new UndoSetTextColor(parseInt(nextCommand[1]), oldColor, 0));
 				}
 			}
-			
-			
+
+
 			else if (nextCommand[0].toUpperCase() == "CREATEBTREENODE")
 			{
 
-				this.animatedObjects.addBTreeNode(parseInt(nextCommand[1]), parseFloat(nextCommand[2]), parseFloat(nextCommand[3]), 
+				this.animatedObjects.addBTreeNode(parseInt(nextCommand[1]), parseFloat(nextCommand[2]), parseFloat(nextCommand[3]),
 			                 parseInt(nextCommand[4]),this.parseColor(nextCommand[7]), this.parseColor(nextCommand[8]));
 				this.animatedObjects.setNodePosition(parseInt(nextCommand[1]), parseInt(nextCommand[5]), parseInt(nextCommand[6]));
 				undoBlock.push(new UndoCreate(parseInt(nextCommand[1])));
@@ -990,9 +990,9 @@ function AnimationManager(objectManager)
 			}
 			else
 			{
-	//			throw "Unknown command: " + nextCommand[0];					
+	//			throw "Unknown command: " + nextCommand[0];
 			}
-			
+
 			this.currentAnimation = this.currentAnimation+1;
 		}
 		this.currFrame = 0;
@@ -1033,11 +1033,11 @@ function AnimationManager(objectManager)
 		this.startNextBlock();
 		this.currentlyAnimating = true;
 		this.fireEvent("AnimationStarted","NoData");
-		timer = setTimeout('timeout()', 30); 
+		timer = setTimeout('timeout()', 30);
 
 	}
-	
-	
+
+
 	// Step backwards one step.  A no-op if the animation is not currently paused
 	this.stepBack = function()
 	{
@@ -1052,9 +1052,9 @@ function AnimationManager(objectManager)
 			// Re-kick thie timer.  The timer may or may not be running at this point,
 			// so to be safe we'll kill it and start it again.
 			clearTimeout(timer);
-			timer = setTimeout('timeout()', 30); 
+			timer = setTimeout('timeout()', 30);
 
-			
+
 		}
 		else if (!this.currentlyAnimating && this.animationPaused && this.undoAnimationStepIndices != null)
 		{
@@ -1064,10 +1064,10 @@ function AnimationManager(objectManager)
 			// Re-kick thie timer.  The timer may or may not be running at this point,
 			// so to be safe we'll kill it and start it again.
 			clearTimeout(timer);
-			timer = setTimeout('timeout()', 30); 
-			
+			timer = setTimeout('timeout()', 30);
+
 		}
-		
+
 	}
 	// Step forwards one step.  A no-op if the animation is not currently paused
 	this.step = function()
@@ -1080,11 +1080,11 @@ function AnimationManager(objectManager)
 			// Re-kick thie timer.  The timer should be going now, but we've had some difficulty with
 			// it timing itself out, so we'll be safe and kick it now.
 			clearTimeout(timer);
-			timer = setTimeout('timeout()', 30); 			
+			timer = setTimeout('timeout()', 30);
 		}
 	}
-	
-	
+
+
 	/// WARNING:  Could be dangerous to call while an animation is running ...
 	this.clearHistory = function()
 	{
@@ -1097,9 +1097,9 @@ function AnimationManager(objectManager)
 		clearTimeout(timer);
 		this.animatedObjects.update();
 		this.animatedObjects.draw();
-		
+
 	}
-	
+
 	this.skipBack = function()
 	{
 		var keepUndoing = this.undoAnimationStepIndices != null && this. undoAnimationStepIndices.length != 0;
@@ -1128,7 +1128,7 @@ function AnimationManager(objectManager)
 													this.currentBlock[i].toY);
 				}
 				keepUndoing = this.finishUndoBlock(this.undoStack.pop());
-				
+
 			}
 			clearTimeout(timer);
 			this.animatedObjects.update();
@@ -1138,9 +1138,9 @@ function AnimationManager(objectManager)
 				this.fireEvent("AnimationUndoUnavailable","NoData");
 			}
 
-		}			
+		}
 	}
-	
+
 	this.resetAll = function()
 	{
 		this.clearHistory();
@@ -1148,7 +1148,7 @@ function AnimationManager(objectManager)
 		this.animatedObjects.draw();
 		clearTimeout(timer);
 	}
-	
+
 	this.skipForward = function()
 	{
 		if (this.currentlyAnimating)
@@ -1175,32 +1175,32 @@ function AnimationManager(objectManager)
 					this.animatedObjects.setNodePosition(objectID,
 													this.currentBlock[i].toX,
 													this.currentBlock[i].toY);
-				}		
-				
+				}
+
 			}
 			this.animatedObjects.update();
 			this.currentlyAnimating = false;
 			this.awaitingStep = false;
 			this.doingUndo = false;
-			
+
 			this.animatedObjects.runFast = false;
 			this.fireEvent("AnimationEnded","NoData");
 			clearTimeout(timer);
 			this.animatedObjects.update();
-			this.animatedObjects.draw();			
+			this.animatedObjects.draw();
 		}
 	}
-	
-	
+
+
 	this.finishUndoBlock = function(undoBlock)
 	{
 		for (var i = undoBlock.length - 1; i >= 0; i--)
 		{
 			undoBlock[i].undoInitialStep(this.animatedObjects);
-			
+
 		}
 		this.doingUndo = false;
-		
+
 		// If we are at the final end of the animation ...
 		if (this.undoAnimationStepIndices.length == 0)
 		{
@@ -1217,27 +1217,27 @@ function AnimationManager(objectManager)
 				this.awaitingStep = false;
 				this.fireEvent("AnimationUndoUnavailable","NoData");
 			}
-			
+
 			clearTimeout(timer);
 			this.animatedObjects.update();
 			this.animatedObjects.draw();
-			
-			
+
+
 			return false;
 		}
 		return true;
 	}
-	
-	
+
+
 	this.undoLastBlock = function()
 	{
-		
+
 		if (this.undoAnimationStepIndices.length == 0)
 		{
-			
+
 			// Nothing on the undo stack.  Return
 			return;
-			
+
 		}
 		if (this.undoAnimationStepIndices.length > 0)
 		{
@@ -1251,10 +1251,10 @@ function AnimationManager(objectManager)
 			{
 				var animateNext  =  undo[i].addUndoAnimation(this.currentBlock);
 				anyAnimations = anyAnimations || animateNext;
-				
+
 			}
 			this.currFrame = 0;
-			
+
 			// Hack:  If there are not any animations, and we are currently paused,
 			// then set the current frame to the end of the animation, so that we will
 			// advance immediagely upon the next step button.  If we are not paused, then
@@ -1263,9 +1263,9 @@ function AnimationManager(objectManager)
 			{
 				this.currFrame = this.animationBlockLength;
 			}
-			this.currentlyAnimating = true;				
+			this.currentlyAnimating = true;
 		}
-		
+
 	}
 	this.setLayer = function(shown, layers)
 	{
@@ -1274,8 +1274,8 @@ function AnimationManager(objectManager)
 		// in the middle of an update loop when this changes
 		this.animatedObjects.draw();
 	}
-	
-	
+
+
 	this.setAllLayers = function(layers)
 	{
 		this.animatedObjects.setAllLayers(layers);
@@ -1283,11 +1283,11 @@ function AnimationManager(objectManager)
 		// in the middle of an update loop when this changes
 		this.animatedObjects.draw();
 	}
-	 
-	
+
+
 	this.update = function()
 	{
-		
+
 		if (this.currentlyAnimating)
 		{
 			this.currFrame = this.currFrame + 1;
@@ -1307,7 +1307,7 @@ function AnimationManager(objectManager)
 					var oldX = this.animatedObjects.getNodeX(objectID);
 					var oldY = this.animatedObjects.getNodeY(objectID);
 					var targetX = this.currentBlock[i].toX;
-					var targety  = this.currentBlock[i].toY;						
+					var targety  = this.currentBlock[i].toY;
 					var newX = this.lerp(this.animatedObjects.getNodeX(objectID), this.currentBlock[i].toX, percent);
 					var newY = this.lerp(this.animatedObjects.getNodeY(objectID), this.currentBlock[i].toY, percent);
 					this.animatedObjects.setNodePosition(objectID, newX, newY);
@@ -1338,24 +1338,24 @@ function AnimationManager(objectManager)
 					}
 				}
 			}
-			this.animatedObjects.update();		
-		
+			this.animatedObjects.update();
+
 		}
 
-		
+
 	}
-	
+
 }
 
 AnimationManager.prototype = new EventListener();
 AnimationManager.prototype.constructor = AnimationManager;
 
-				
+
 function SingleAnimation(id, fromX, fromY, toX, toY)
 {
 	this.objectID = id;
 	this.fromX = fromX;
 	this.fromY = fromY;
 	this.toX = toX;
-	this.toY = toY;	
+	this.toY = toY;
 }
