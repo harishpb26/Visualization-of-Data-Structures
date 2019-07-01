@@ -1,6 +1,8 @@
 import ply.lex as lex
 import ply.yacc as yacc
+import json
 import sys
+import copy
 
 #tokens list specifying all of the possible tokens
 tokens = [
@@ -49,7 +51,7 @@ reserved = {
 }
 
 tokens += reserved.values()
- 
+
 # Regular expression rules for simple tokens
 t_CONTINUE = r'continue'
 t_CASE = r'case'
@@ -90,7 +92,7 @@ def t_ID(t):
     if t.value in reserved:
         t.type = reserved[t.value]
     return t
-	
+
 def t_NUMFLOAT(t):
 	r'\d+\.\d+'
 	t.value = float(t.value)
@@ -99,7 +101,7 @@ def t_NUMFLOAT(t):
 def t_NUMINT(t):
 	r'\d+'
 	try:
-		t.value = int(t.value) 
+		t.value = int(t.value)
 	except ValueError:
 		print("line %d: number %s is too large!" ,(t.lineno,t.value))
 		t.value = 0
@@ -109,7 +111,7 @@ def t_NUMINT(t):
 def t_NEWLINE(t):
 	r'\n+'
 	t.lexer.lineno += len(t.value)
-	
+
 
 #ignored characters such as spaces
 t_ignore  = ' \t'
@@ -118,8 +120,8 @@ t_ignore  = ' \t'
 def t_error(t):
 	print ("illegal character '%s'" , t.value[0])
 	t.lexer.skip(1)
-  
-  
+
+
 def t_COMMENT(t):
     r'\#.*'
     pass
@@ -147,7 +149,13 @@ var_value = {}
 var_type = {}
 
 #final dictionary containing both type and value
-values = {}
+var_dict = {}
+
+precedence = (
+	('left', 'PLUS', 'MINUS'),
+    ('left', 'MULT', 'DIVIDE')
+)
+    
 
 def p_primary_expression(p):
 	'''
@@ -163,67 +171,69 @@ def p_primary_expression(p):
                         |	struct_pointer_assign_dynamic SEMICOLON primary_expression
 						|	struct_assign1 SEMICOLON primary_expression
 						|	dynamic SEMICOLON primary_expression
-						|	expression SEMICOLON 
+						|	expression SEMICOLON
 						|	var_assign SEMICOLON
 						|	var_declare SEMICOLON
 						|	pointer_declare_without_assign SEMICOLON
-						|	pointer_assign SEMICOLON 
+						|	pointer_assign SEMICOLON
 						|	pointer_declare SEMICOLON
 						|	structure_declare SEMICOLON
 						|	struct_pointer_declare SEMICOLON
 						|	struct_pointer_assign SEMICOLON
-                        |	struct_pointer_assign_dynamic SEMICOLON 
+                        |	struct_pointer_assign_dynamic SEMICOLON
 						|	struct_assign1 SEMICOLON
 						|	dynamic SEMICOLON
-						
-	'''	
+
+	'''
 
 def p_var_declare_without_assign(p):
 	'''
 	var_declare	:	INT ID
 				|	FLOAT ID
 	'''
-	if(p[2] not in values):
+	if(p[2] not in var_dict):
 		#var_type[p[2]] = p[1]
-		values[p[2]] = [p[1]]
-		values[p[2]].insert(1,'?')
-		
-	
-	
+		var_dict[p[2]] = [p[1]]
+		var_dict[p[2]].insert(1,'?')
+
+
+
 def p_var_declare(p):
 	'''
 	var_declare	:	INT	ID ASSIGN expression
-				|	FLOAT ID ASSIGN expression 
+				|	FLOAT ID ASSIGN expression
 	'''
 	#print("variable ", p[2], "of type ", p[1])
-	
 
-	if(p[2] not in values):
+
+	if(p[2] not in var_dict):
 		#var_type[p[2]] = p[1]
-		values[p[2]] = [p[1]]
-	
+		var_dict[p[2]] = [p[1]]
+	'''
 	if(isinstance(p[4],tuple)):
-		v=values[p[4][1]][1]
-		values[p[2]].insert(1,v)
+		v = var_dict[p[4][1]][1]
+		var_dict[p[2]].insert(1,v)
 	else:
-		values[p[2]].insert(1,p[4])
-	
-		
-	
+		'''
+	var_dict[p[2]].insert(1,p[4])
+
+
+
 
 def p_var_assign(p):
 	'''
 	var_assign	:	ID ASSIGN expression
-	
+
 	'''
-	
+	'''
 	if(isinstance(p[3],tuple)):
-		v=values[p[3][1]][1]
-		values[p[1]][1] = v
+		v = var_dict[p[3][1]][1]
+		var_dict[p[1]][1] = v
 	else:
-		values[p[1]][1]=p[3]
-	
-	
+	'''
+	var_dict[p[1]][1] = p[3]
+
+
 	#var_value[p[1]] = p[3]
 	#p[0] = (p[2], p[1], p[3])
 
@@ -233,17 +243,17 @@ def p_pointer_declare_without_assign(p):
 	pointer_declare_without_assign : INT MULT ID
 				    | FLOAT MULT ID
 	'''
-	
+
 	#print("pointer ", p[3] , " of type ", p[1])
 	#var_type[p[3]] = p[1] + "*"
-	#values[p[3]]
+	#var_dict[p[3]]
 
 
 
 def p_pointer_assign(p):
 	'''
 	pointer_assign : ID ASSIGN ADDR ID
-				   
+
 	'''
 	var_value[p[1]] = "&" + p[4]
 
@@ -253,31 +263,31 @@ def p_pointer_declare(p):
 	pointer_declare : INT MULT ID ASSIGN ADDR ID
 				   | FLOAT MULT ID ASSIGN ADDR ID
 	'''
-	
+
 	#print("pointer ", p[3] , " of type ", p[1])
 	var_type[p[3]] = p[1] + "*"
 	var_value[p[3]] = "&" + p[6]
-	
-	
+
+
 def p_struct_pointer_declare(p):
 	'''
-	struct_pointer_declare	:	STRUCT ID MULT ID 
+	struct_pointer_declare	:	STRUCT ID MULT ID
 	'''
 	#var_type[p[4]] = p[2] + "*"
-	values[p[4]] = [p[1]+" "+p[2]]
-	values[p[4]].insert(1,var_type[p[2]])
-	
+	var_dict[p[4]] = [p[1] + " " + p[2]]
+	var_dict[p[4]].insert(1,var_type[p[2]])
+
 
 def p_struct_pointer_assign(p):
 	'''
 	struct_pointer_assign	:	STRUCT ID MULT ID ASSIGN ID
-				   
+
 	'''
 	#var_type[p[4]] = p[2] + "*"
 	#var_value[p[4]] = "&" + p[6]
 
-	values[p[4]] = values[p[6]]
-	
+	var_dict[p[4]] = var_dict[p[6]]
+
 
 
 
@@ -285,32 +295,38 @@ def p_struct_pointer_assign(p):
 
 def p_struct_pointer_assign_dynamic(p):
 	'''
-	struct_pointer_assign_dynamic	:	STRUCT ID MULT ID ASSIGN MALLOC LPAREN size2 RPAREN 
+	struct_pointer_assign_dynamic	:	STRUCT ID MULT ID ASSIGN MALLOC LPAREN size2 RPAREN
 	'''
 	#var_type[p[4]] = p[2] + "*"
-	values[p[4]] = [p[1]+" "+p[2]]
-	values[p[4]].insert(1,var_type[p[2]])
+	var_dict[p[4]] = [p[1] + " " + p[2]]
+	tempdict = copy.deepcopy(var_type[p[2]])
+	var_dict[p[4]].insert(1,tempdict)
 
 
 
 def p_struct_assign1(p):
 	'''
-	struct_assign1 : ID ARROW ID ASSIGN NUMINT 
-				   | ID ARROW ID ASSIGN NUMFLOAT
+	struct_assign1 : ID ARROW ID ASSIGN expression
 				   | ID ARROW ID ASSIGN NULL
-				   | ID ARROW ID ASSIGN ID
+				 
+	'''
 	'''
 	if(isinstance(p[5],str) & (p[5]!='NULL')):
-		listx = list(values[p[1]][1][p[3]])
-		listx[1] = values[p[5]][1]
-		values[p[1]][1][p[3]] = tuple(listx)
+		
+		listx = list(var_dict[p[1]][1][p[3]])
+		listx[1] = var_dict[p[5]][1]
+		var_dict[p[1]][1][p[3]] = tuple(listx)
+		
 	else:
-		listx = list(values[p[1]][1][p[3]])
+		listx = list(var_dict[p[1]][1][p[3]])
 		listx[1] = p[5]
-		values[p[1]][1][p[3]] = tuple(listx)
+		var_dict[p[1]][1][p[3]] = tuple(listx)
+	'''
+	listx = list(var_dict[p[1]][1][p[3]])
+	listx[1] = p[5]
+	var_dict[p[1]][1][p[3]] = tuple(listx)
+
 	
-
-
 def p_dynamic(p):
 	'''
 	dynamic	:	INT MULT ID ASSIGN MALLOC LPAREN size1 RPAREN
@@ -344,8 +360,8 @@ def p_size3(p):
 			|   NUMFLOAT	multiplier
 	'''
 	p[0] = p[1] + str(p[2])
-	
-	
+
+
 def p_dynamic_init(p):
 	'''
 	dynamic :	ID ASSIGN MALLOC LPAREN size1 RPAREN
@@ -353,35 +369,33 @@ def p_dynamic_init(p):
 				 |  ID ASSIGN MALLOC LPAREN size3 RPAREN
 	'''
 	#print("dynamically allocated ",p[1]," with malloc of size", p[5])
-		
+
 
 def p_multiplier(p):
 	'''
 	multiplier	:	PLUS NUMINT
-				|	MULT NUMINT 
+				|	MULT NUMINT
 				|	DIVIDE NUMINT
 				|	MINUS NUMINT
 				|	empty
 	'''
-	
-	
+
+
 def p_structure_declare(p):
 	'''
-	structure_declare	:	STRUCT ID LEFTBRACE content RIGHTBRACE 
-					
+	structure_declare	:	STRUCT ID LEFTBRACE content RIGHTBRACE
+
 	'''
 	if(p[2] not in var_type):
 		var_type[p[2]] = dict()
-		counter=0
 		for i in det:
 			var,ty = i.split(':')
-			var_type[p[2]][var]=(ty,'?',counter)
-			counter+=1
+			var_type[p[2]][var] = (ty,'?')
 		del det[:]
 		#print(det)
 	#print("This is a structure",p[2])
-	
-det = []	
+
+det = []
 def p_content(p):
 	'''
 	content	:	struct_content
@@ -389,19 +403,19 @@ def p_content(p):
 			|	FLOAT ID SEMICOLON content
 			|	FLOAT ID SEMICOLON
 			|	INT ID SEMICOLON
-			
-	
+
+
 	'''
-	
+
 	try:
 		if(p[2] not in var_type):
-			det.append(p[2]+":"+p[1])
+			det.append(p[2] + ":" + p[1])
 			#print(det)
 	except:
 		pass
 
-	
-		
+
+
 
 def p_struct_content(p):
 	'''
@@ -411,33 +425,59 @@ def p_struct_content(p):
 	'''
 	try:
 		if(p[4] not in var_type):
-			det.append(p[4]+":"+p[1]+" "+p[2]+p[3])
+			det.append(p[4] + ":" + p[1] + " " + p[2] + p[3])
 			#print(det)
 	except:
 		pass
 
 
-def p_expression(p):
+def p_expression1(p):
 	'''
 	expression	:	expression MULT expression
-				|	expression DIVIDE expression
-				|	expression PLUS expression
-				|	expression 	MINUS expression
-				
 	'''
+	p[0] = p[1] * p[3]
+
+def p_expression2(p):
+	'''
+	expression	:	expression PLUS expression
+
+	'''
+	p[0] = p[1] + p[3]
 	
+
+def p_expression3(p):
+	'''
+	expression	:	expression DIVIDE expression
+		
+	'''
+	p[0] = p[1] / p[3]
+	
+def p_expression4(p):
+	'''
+	expression	:	expression MINUS expression
+			
+	'''
+	p[0] = p[1] - p[3]
 
 
 def p_expression_var(p):
 	'''
 	expression	:	ID
-	
+
 	'''
-	p[0] = ('var', p[1])
+	p[0] = var_dict[p[1]][1]
+	#print(p[0])
+
+def p_expression_structvar(p):
+	'''
+	expression	:	ID ARROW ID
+
+	'''
+	p[0] = var_dict[p[1]][1][p[3]][1]
 	#print(p[0])
 
 
-	
+
 def p_expression_int_float(p):
 	'''
 	expression	:	NUMINT
@@ -448,28 +488,32 @@ def p_expression_int_float(p):
 
 
 def p_empty(p):
-	'''	
-	empty	:	
+	'''
+	empty	:
 	'''
 
 def p_error(p):
 	print("parseError")
 
 
-#build the parser	
+#build the parser
 parser = yacc.yacc()
 
 
 string = ''
 
-f = open("input.txt","r")
+f = open("input.c","r")
 for line in f:
 	try:
-		string += line	
+		string += line
 	except EOFError:
 		break
 parser.parse(string)
 
 print(var_type)
 print(var_value)
-print(values)
+print(var_dict)
+
+#create json file
+with open("var_dict.json","w") as f:
+	json.dump(var_dict, f)
