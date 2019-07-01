@@ -2,6 +2,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 import json
 import sys
+import copy
 
 #tokens list specifying all of the possible tokens
 tokens = [
@@ -150,6 +151,12 @@ var_type = {}
 #final dictionary containing both type and value
 var_dict = {}
 
+precedence = (
+	('left', 'PLUS', 'MINUS'),
+    ('left', 'MULT', 'DIVIDE')
+)
+    
+
 def p_primary_expression(p):
 	'''
 	primary_expression	:	expression SEMICOLON primary_expression
@@ -202,12 +209,13 @@ def p_var_declare(p):
 	if(p[2] not in var_dict):
 		#var_type[p[2]] = p[1]
 		var_dict[p[2]] = [p[1]]
-
+	'''
 	if(isinstance(p[4],tuple)):
 		v = var_dict[p[4][1]][1]
 		var_dict[p[2]].insert(1,v)
 	else:
-		var_dict[p[2]].insert(1,p[4])
+		'''
+	var_dict[p[2]].insert(1,p[4])
 
 
 
@@ -217,12 +225,13 @@ def p_var_assign(p):
 	var_assign	:	ID ASSIGN expression
 
 	'''
-
+	'''
 	if(isinstance(p[3],tuple)):
 		v = var_dict[p[3][1]][1]
 		var_dict[p[1]][1] = v
 	else:
-		var_dict[p[1]][1] = p[3]
+	'''
+	var_dict[p[1]][1] = p[3]
 
 
 	#var_value[p[1]] = p[3]
@@ -290,28 +299,34 @@ def p_struct_pointer_assign_dynamic(p):
 	'''
 	#var_type[p[4]] = p[2] + "*"
 	var_dict[p[4]] = [p[1] + " " + p[2]]
-	var_dict[p[4]].insert(1,var_type[p[2]])
+	tempdict = copy.deepcopy(var_type[p[2]])
+	var_dict[p[4]].insert(1,tempdict)
 
 
 
 def p_struct_assign1(p):
 	'''
-	struct_assign1 : ID ARROW ID ASSIGN NUMINT
-				   | ID ARROW ID ASSIGN NUMFLOAT
+	struct_assign1 : ID ARROW ID ASSIGN expression
 				   | ID ARROW ID ASSIGN NULL
-				   | ID ARROW ID ASSIGN ID
+				 
+	'''
 	'''
 	if(isinstance(p[5],str) & (p[5]!='NULL')):
+		
 		listx = list(var_dict[p[1]][1][p[3]])
 		listx[1] = var_dict[p[5]][1]
 		var_dict[p[1]][1][p[3]] = tuple(listx)
+		
 	else:
 		listx = list(var_dict[p[1]][1][p[3]])
 		listx[1] = p[5]
 		var_dict[p[1]][1][p[3]] = tuple(listx)
+	'''
+	listx = list(var_dict[p[1]][1][p[3]])
+	listx[1] = p[5]
+	var_dict[p[1]][1][p[3]] = tuple(listx)
 
-
-
+	
 def p_dynamic(p):
 	'''
 	dynamic	:	INT MULT ID ASSIGN MALLOC LPAREN size1 RPAREN
@@ -416,15 +431,33 @@ def p_struct_content(p):
 		pass
 
 
-def p_expression(p):
+def p_expression1(p):
 	'''
 	expression	:	expression MULT expression
-				|	expression DIVIDE expression
-				|	expression PLUS expression
-				|	expression 	MINUS expression
+	'''
+	p[0] = p[1] * p[3]
+
+def p_expression2(p):
+	'''
+	expression	:	expression PLUS expression
 
 	'''
+	p[0] = p[1] + p[3]
+	
 
+def p_expression3(p):
+	'''
+	expression	:	expression DIVIDE expression
+		
+	'''
+	p[0] = p[1] / p[3]
+	
+def p_expression4(p):
+	'''
+	expression	:	expression MINUS expression
+			
+	'''
+	p[0] = p[1] - p[3]
 
 
 def p_expression_var(p):
@@ -432,7 +465,15 @@ def p_expression_var(p):
 	expression	:	ID
 
 	'''
-	p[0] = ('var', p[1])
+	p[0] = var_dict[p[1]][1]
+	#print(p[0])
+
+def p_expression_structvar(p):
+	'''
+	expression	:	ID ARROW ID
+
+	'''
+	p[0] = var_dict[p[1]][1][p[3]][1]
 	#print(p[0])
 
 
