@@ -3,6 +3,7 @@ import json
 import subprocess
 from flask import Flask, render_template, request
 from flask_cors import CORS
+from cgrammar import cgrammarfunc
 
 app = Flask(__name__)
 CORS(app)
@@ -15,17 +16,28 @@ def index():
 def upload():
 
 	text = request.form['insert_code']
+	'''
+	print(text, type(text))
+	for i in text.split('\n'):
+		print(i)
+	'''
+	for i in text.split('\n'):
+		if(i):
+			print(i)
+			cgrammarfunc(i)
+
 	f = open("input.c","w")
 	f.write(text)
 	f.close()
 
-	p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, check = True)
+	#p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, 	check = True)
 
 	'''
-	p = subprocess.Popen(['python', 'cgrammar.py'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-	stdout,stderr = p.communicate()
+	p = subprocess.Popen(['python','cgrammar.py'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+	p = subprocess.check_output(['python','cgrammar.py'])
+	stdout, stderr = p.communicate()
 	#rc = p.returncode
-	print(stdout,type(stdout))
+	print(p,type(p))
 	my_json = stdout.decode("utf8").replace("'",'"')
 	print(my_json)
 	#return json.dumps(my_json)
@@ -48,12 +60,12 @@ def animek():
 		data = json.load(f)
 	#data = {"a": ["int", 10], "p": ["struct Node", {"data": ["int", "?"], "link": ["struct Node*", "?"]}]}
 	iter = 0
-	xpos = 80
+	xpos = 120
 	ypos = 60
 	height = 50
 	width = 120
-	xvpos = xpos
-	yvpos = ypos + height*6
+	xvpos = xpos + width * 5
+	yvpos = ypos
 	xtemp = xpos
 	ytemp = ypos
 	xvtemp = xvpos
@@ -66,13 +78,13 @@ def animek():
 				data[key][1][content_key].insert(3, iter)
 				data[key][1][content_key].insert(2, [xtemp,ytemp])
 				iter += 2
-			ytemp = ypos
-			xtemp = xtemp + width*13
+			ytemp = ytemp + height * 2
+			xtemp = xpos
 			data[key].insert(3, iter)
 			iter += 1
 		else:
 			data[key].insert(2, [xvtemp,yvtemp])
-			xvtemp = xvtemp+ width*1.5
+			yvtemp = yvtemp+ height*2.5
 			data[key].insert(3, iter)
 			iter += 2
 
