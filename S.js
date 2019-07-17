@@ -43,15 +43,16 @@ $.get("/anime", function(data) {
 */
 
 
-var dict;
+var fulldict;
 var req = new XMLHttpRequest();
 req.open('GET','http://127.0.0.1:8080/animek',false);
 req.setRequestHeader('Content-type','application/json; charset=utf-8');
 req.onload = function(){
-  dict = JSON.parse(req.responseText);
+  fulldict = JSON.parse(req.responseText);
+ // console.log(dict);
 };
 req.send();
-
+console.log(fulldict);
 
 // set to add the contents of the structure
 /*
@@ -123,8 +124,44 @@ S.prototype.reset = function()
     // Reset the (very simple) memory manager
     this.nextIndex = 0;
 }
+count = -1;
+console.log(fulldict.length)
+function nextone()
+{
+    
+    if(count<fulldict.length-1)
+    {
+        count++;
+        init();
+        currentAlg.setup(fulldict[count]);
+        console.log(count);
 
-S.prototype.setup = function(){
+    }
+    else
+    {
+        alert("complete");
+    }
+}
+
+function prevone()
+{
+    if(count>0)
+    {
+        count--;
+        init();
+        console.log(count);
+        currentAlg.setup(fulldict[count]);
+    }
+    else
+    {
+        alert("beginning");
+    }
+    
+}
+
+
+
+S.prototype.setup = function(dict){
     this.commands = [];
     //dict = {"a": ["int", 10, [80, 310], 0], "p": ["struct Node", {"link": ["struct Node*", "?", [80, 110], 2], "data": ["int", "?", [80, 160], 4]}, [80, 60], 6], "b": ["int", 4, [260.0, 310], 7]};
     //dict = {"b": ["int", 4, [80, 310], 0],  "a": ["int", 10, [260, 310], 7]};
