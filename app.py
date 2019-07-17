@@ -7,6 +7,7 @@ from cgrammar import cgrammarfunc
 
 app = Flask(__name__)
 CORS(app)
+complist = []
 
 @app.route('/')
 def index():
@@ -21,16 +22,18 @@ def upload():
 	for i in text.split('\n'):
 		print(i)
 	'''
-	for i in text.split('\n'):
-		if(i):
-			print(i)
-			cgrammarfunc(i)
 
+	for i in text.split('\n'):
+		if(i.strip()):
+			print(i)
+			complist.append(json.loads(cgrammarfunc(i)))
+
+	print(complist)
 	f = open("input.c","w")
 	f.write(text)
 	f.close()
 
-	#p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, 	check = True)
+	#p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE,check = True)
 
 	'''
 	p = subprocess.Popen(['python','cgrammar.py'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
@@ -56,9 +59,6 @@ def anime():
 
 @app.route('/animek')
 def animek():
-	with open("var_dict.json") as f:
-		data = json.load(f)
-	#data = {"a": ["int", 10], "p": ["struct Node", {"data": ["int", "?"], "link": ["struct Node*", "?"]}]}
 	iter = 0
 	xpos = 120
 	ypos = 60
@@ -70,26 +70,45 @@ def animek():
 	ytemp = ypos
 	xvtemp = xvpos
 	yvtemp = yvpos
-	for key in data:
-		if(isinstance(data[key][1], dict)):
-			data[key].insert(2, [xtemp, ytemp])
-			for content_key in data[key][1]:
-				ytemp = ytemp + height
-				data[key][1][content_key].insert(3, iter)
-				data[key][1][content_key].insert(2, [xtemp,ytemp])
-				iter += 2
-			ytemp = ytemp + height * 2
-			xtemp = xpos
-			data[key].insert(3, iter)
-			iter += 1
-		else:
-			data[key].insert(2, [xvtemp,yvtemp])
-			yvtemp = yvtemp+ height*2.5
-			data[key].insert(3, iter)
-			iter += 2
-
-	return json.dumps(data)
-
+	#with open("var_dict.json") as f:
+	#	data = json.load(f)
+	#data = {"a": ["int", 10], "p": ["struct Node", {"data": ["int", "?"], "link": ["struct Node*", "?"]}]}
+	tempdict = {}
+	for data in complist:
+		for key in data:
+			if(key in tempdict):
+				if(isinstance(data[key][1], dict)):
+					data[key].insert(2,tempdict[key][2])
+					data[key].insert(3,tempdict[key][3])
+					for content in data[key][1]:
+						data[key][1][content].insert(3, tempdict[key][1][content][3])
+						data[key][1][content].insert(2, tempdict[key][1][content][2])
+				else:
+					data[key].insert(2,tempdict[key][2])
+					data[key].insert(3, tempdict[key][3])
+			else:
+				
+				
+				if(isinstance(data[key][1], dict)):
+					data[key].insert(2, [xtemp, ytemp])
+					for content_key in data[key][1]:
+						ytemp = ytemp + height
+						data[key][1][content_key].insert(3, iter)
+						data[key][1][content_key].insert(2, [xtemp,ytemp])
+						iter += 2
+					ytemp = ytemp + height * 2
+					xtemp = xpos
+					data[key].insert(3, iter)
+					iter += 1
+				else:
+					data[key].insert(2, [xvtemp,yvtemp])
+					yvtemp = yvtemp+ height*2.5
+					data[key].insert(3, iter)
+					iter += 2
+				tempdict[key] = data[key]
+	complist1 = json.dumps(complist)			
+	print(type(complist1))
+	return complist1
 
 
 @app.route('/QueueArray')
