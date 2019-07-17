@@ -533,4 +533,5 @@ def cgrammarfunc(inp):
     #create json file
     with open("var_dict.json","w") as f:
     	json.dump(var_dict, f)
+
     return json.dumps(var_dict)
