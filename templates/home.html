@@ -5,7 +5,9 @@
 {% block content %}
 	<h1>Home Page</h1>
 	<form id = "upload_form" method = "POST">
-		<input name = "insert_code" type = "text">
+		<textarea name="insert_code" rows="20" cols="80"></textarea>
+		<!--<input name = "insert_code" type = "text" height = "100">-->
+		<br>
 		<input type = "submit" name = "submit">
 	</form>
 {% endblock content %}

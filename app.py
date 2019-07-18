@@ -15,14 +15,9 @@ def index():
 
 @app.route('/', methods = ['POST'])
 def upload():
-
 	text = request.form['insert_code']
-	'''
-	print(text, type(text))
-	for i in text.split('\n'):
-		print(i)
-	'''
-
+	global complist
+	complist = []
 	for i in text.split('\n'):
 		if(i.strip()):
 			print(i)
@@ -33,9 +28,9 @@ def upload():
 	f.write(text)
 	f.close()
 
-	#p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE,check = True)
-
 	'''
+	p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE,check = True)
+
 	p = subprocess.Popen(['python','cgrammar.py'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 	p = subprocess.check_output(['python','cgrammar.py'])
 	stdout, stderr = p.communicate()
@@ -70,25 +65,24 @@ def animek():
 	ytemp = ypos
 	xvtemp = xvpos
 	yvtemp = yvpos
-	#with open("var_dict.json") as f:
-	#	data = json.load(f)
 	#data = {"a": ["int", 10], "p": ["struct Node", {"data": ["int", "?"], "link": ["struct Node*", "?"]}]}
-	tempdict = {}
+	temp = {}
+	print(complist)
 	for data in complist:
 		for key in data:
-			if(key in tempdict):
+			if(key in temp):
 				if(isinstance(data[key][1], dict)):
-					data[key].insert(2,tempdict[key][2])
-					data[key].insert(3,tempdict[key][3])
+					data[key].insert(2,temp[key][2])
+					data[key].insert(3,temp[key][3])
 					for content in data[key][1]:
-						data[key][1][content].insert(3, tempdict[key][1][content][3])
-						data[key][1][content].insert(2, tempdict[key][1][content][2])
+						data[key][1][content].insert(3, temp[key][1][content][3])
+						data[key][1][content].insert(2, temp[key][1][content][2])
+
 				else:
-					data[key].insert(2,tempdict[key][2])
-					data[key].insert(3, tempdict[key][3])
+					data[key].insert(2,temp[key][2])
+					data[key].insert(3, temp[key][3])
+
 			else:
-				
-				
 				if(isinstance(data[key][1], dict)):
 					data[key].insert(2, [xtemp, ytemp])
 					for content_key in data[key][1]:
@@ -100,15 +94,15 @@ def animek():
 					xtemp = xpos
 					data[key].insert(3, iter)
 					iter += 1
+
 				else:
 					data[key].insert(2, [xvtemp,yvtemp])
 					yvtemp = yvtemp+ height*2.5
 					data[key].insert(3, iter)
 					iter += 2
-				tempdict[key] = data[key]
-	complist1 = json.dumps(complist)			
-	print(type(complist1))
-	return complist1
+				temp[key] = data[key]
+
+	return json.dumps(complist)
 
 
 @app.route('/QueueArray')

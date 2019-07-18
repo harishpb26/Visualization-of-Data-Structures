@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap CSS-->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <!-- css sheet for how the page is laid out -->
@@ -44,6 +44,8 @@
         <h1>{% block headtitle %}{% endblock %}</h1>
     </div>
 
+      {% block button %}{% endblock %}
+
     <div = id = "mainContent">
 
         <div id = "algoControlSection">
@@ -57,8 +59,8 @@
         <canvas id="canvas" width="2000" height="600"></canvas>
 
         <div id = "generalAnimationControlSection">
-            <!-- Table for buttons to control general animation (play/pause/undo/etc) ->
-            <!-- (filled in by javascript code, specifically AnimationMain.js)  -->
+            <!-- Table for buttons to control general animation (play/pause/undo/etc)
+            (filled in by javascript code, specifically AnimationMain.js)  -->
 
             <table id="GeneralAnimationControls">  </table>
         </div>
