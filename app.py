@@ -13,16 +13,26 @@ complist = []
 def index():
 	return render_template('home.html')
 
+#final dictionary containing both type and value
+var_dict = {}
+
+#dictionary of types
+var_type = {}
+
+text = ""
+
 @app.route('/', methods = ['POST'])
 def upload():
+	global text
 	text = request.form['insert_code']
 	global complist
 	complist = []
 	for i in text.split('\n'):
 		if(i.strip()):
 			print(i)
-			complist.append(json.loads(cgrammarfunc(i)))
-
+			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type)))
+	var_dict.clear()
+	var_type.clear()
 	print(complist)
 	f = open("input.c","w")
 	f.write(text)
@@ -67,7 +77,6 @@ def animek():
 	yvtemp = yvpos
 	#data = {"a": ["int", 10], "p": ["struct Node", {"data": ["int", "?"], "link": ["struct Node*", "?"]}]}
 	temp = {}
-	print(complist)
 	for data in complist:
 		for key in data:
 			if(key in temp):
@@ -101,7 +110,7 @@ def animek():
 					data[key].insert(3, iter)
 					iter += 2
 				temp[key] = data[key]
-
+	print(complist)
 	return json.dumps(complist)
 
 
@@ -112,7 +121,7 @@ def QueueArray():
 
 @app.route('/Structure')
 def Structure():
-	return render_template('S.html')
+	return render_template('S.html',text = text.split('\n'))
 
 
 if __name__ == '__main__':

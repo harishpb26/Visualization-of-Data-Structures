@@ -28,7 +28,7 @@
 // Object Manager
 //
 // Manage all of our animated objects.  Control any animated object should occur through
-// this interface (not language enforced, because enforcing such things in Javascript is 
+// this interface (not language enforced, because enforcing such things in Javascript is
 // problematic.)
 //
 // This class is only accessed through:
@@ -37,10 +37,10 @@
 //  Undo objects (which are themselves controlled by AnimationMain
 
 
-// TODO: 
+// TODO:
 //       1.  Add proper throws for all error conditions (perhaps guarded by
 //           an assert-like structure that can be turned off for production?)
-//       2.  Refactor this code so that it uses the same object syntax (with 
+//       2.  Refactor this code so that it uses the same object syntax (with
 //           prototypes) as te rest of the code.  (low priority)
 function ObjectManager()
 {
@@ -55,23 +55,23 @@ function ObjectManager()
 	this.height = 0;
 	this.statusReport = new AnimatedLabel(-1, "XXX", false, 30);
 	this.statusReport.x = 30;
-	
+
 	this.draw = function()
 	{
 		this.framenum++;
 		if (this.framenum > 1000)
 			this.framenum = 0;
-		
+
 		this.ctx.clearRect(0,0,this.width,this.height); // clear canvas
 		this.statusReport.y = this.height - 15;
-		
+
 		var i;
 		var j;
 		for (i = 0; i < this.Nodes.length; i++)
 		{
 			if (this.Nodes[i] != null && !this.Nodes[i].highlighted && this.Nodes[i].addedToScene && !this.Nodes[i].alwaysOnTop)
 			{
-				this.Nodes[i].draw(this.ctx);	
+				this.Nodes[i].draw(this.ctx);
 			}
 		}
 		for (i = 0; i < this.Nodes.length; i++)
@@ -79,20 +79,20 @@ function ObjectManager()
 			if (this.Nodes[i] != null && (this.Nodes[i].highlighted && !this.Nodes[i].alwaysOnTop) && this.Nodes[i].addedToScene)
 			{
 				this.Nodes[i].pulseHighlight(this.framenum);
-				this.Nodes[i].draw(this.ctx);	
+				this.Nodes[i].draw(this.ctx);
 			}
 		}
-		
+
 		for (i = 0; i < this.Nodes.length; i++)
 		{
 			if (this.Nodes[i] != null && this.Nodes[i].alwaysOnTop && this.Nodes[i].addedToScene)
 			{
 				this.Nodes[i].pulseHighlight(this.framenum);
-				this.Nodes[i].draw(this.ctx);	
+				this.Nodes[i].draw(this.ctx);
 			}
 		}
-		
-		
+
+
 		for (i = 0; i < this.Edges.length; i++)
 		{
 			if (this.Edges[i] != null)
@@ -101,25 +101,25 @@ function ObjectManager()
 				{
 					if (this.Edges[i][j].addedToScene)
 					{
-						this.Edges[i][j].pulseHighlight(this.framenum);	
-						this.Edges[i][j].draw(this.ctx);	
+						this.Edges[i][j].pulseHighlight(this.framenum);
+						this.Edges[i][j].draw(this.ctx);
 					}
-					
+
 				}
-				
+
 			}
 		}
 		this.statusReport.draw(this.ctx);
-		
+
 	}
-	
+
 	this.update = function ()
 	{
-		
-		
+
+
 	}
-	
-	
+
+
 	this.setLayers = function(shown,layers)
 	{
 		for (var i = 0; i < layers.length; i++)
@@ -127,10 +127,10 @@ function ObjectManager()
 			this.activeLayers[layers[i]] = shown;
 		}
 		this.resetLayers();
-		
+
 	}
 
-	
+
 	this.addHighlightCircleObject = function(objectID, objectColor, radius)
 	{
 		if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
@@ -138,12 +138,12 @@ function ObjectManager()
   	            throw "addHighlightCircleObject:Object with same ID (" + String(objectID) + ") already Exists!"
 		}
 		var newNode = new HighlightCircle(objectID, objectColor, radius)
-		this.Nodes[objectID] = newNode;		
+		this.Nodes[objectID] = newNode;
 	}
-	
+
 	this.setEdgeAlpha = function(fromID, toID, alphaVal)
 	{
-		var oldAlpha = 1.0; 
+		var oldAlpha = 1.0;
 		if (this.Edges[fromID] != null &&
 			this.Edges[fromID] != undefined)
 		{
@@ -155,22 +155,22 @@ function ObjectManager()
 					this.Edges[fromID][i].Node2 == this.Nodes[toID])
 				{
 					oldAlpha = this.Edges[fromID][i].alpha
-					this.Edges[fromID][i].alpha = alphaVal;		
+					this.Edges[fromID][i].alpha = alphaVal;
 				}
 			}
-		}	
+		}
 		return oldAlpha;
-		
+
 	}
-	
-	this.setAlpha = function(nodeID, alphaVal) 
+
+	this.setAlpha = function(nodeID, alphaVal)
 	{
 		if (this.Nodes[nodeID] != null && this.Nodes[nodeID] != undefined)
 		{
 			this.Nodes[nodeID].setAlpha(alphaVal);
 		}
 	}
-	
+
 	this.getAlpha = function(nodeID)
 	{
 		if (this.Nodes[nodeID] != null && this.Nodes[nodeID] != undefined)
@@ -182,7 +182,7 @@ function ObjectManager()
 			return -1;
 		}
 	}
-	
+
 	this.getTextColor = function(nodeID, index)
 	{
 		if (this.Nodes[nodeID] != null && this.Nodes[nodeID] != undefined)
@@ -193,9 +193,9 @@ function ObjectManager()
 		{
 			return "#000000";
 		}
-			
+
 	}
-	
+
 	this.setTextColor = function(nodeID, color, index)
 	{
 		if (this.Nodes[nodeID] != null && this.Nodes[nodeID] != undefined)
@@ -214,9 +214,9 @@ function ObjectManager()
 	}
 
 
-	
-	
-	
+
+
+
 	this.setAllLayers = function(layers)
 	{
 		this.activeLayers = [];
@@ -226,7 +226,7 @@ function ObjectManager()
 		}
 		this.resetLayers();
 	}
-	
+
 	this.resetLayers = function()
 	{
 		var i
@@ -249,17 +249,17 @@ function ObjectManager()
 								this.activeLayers[this.Edges[i][j].Node1.layer] == true &&
 								this.activeLayers[this.Edges[i][j].Node2.layer] == true;
 					}
-					
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	this.setLayer = function(objectID, layer)
 	{
 		if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
@@ -282,7 +282,7 @@ function ObjectManager()
 					{
 						nextEdge.addedToScene = ((nextEdge.Node1.addedToScene) &&
 												(nextEdge.Node2.addedToScene));
-						
+
 					}
 				}
 			}
@@ -295,39 +295,39 @@ function ObjectManager()
 					{
 						nextEdge.addedToScene = ((nextEdge.Node1.addedToScene) &&
 												 (nextEdge.Node2.addedToScene));
-						
+
 					}
 				}
-			}			
+			}
 		}
 	}
-	
+
 	this.clearAllObjects = function()
 	{
 		this.Nodes = [];
 		this.Edges = [];
 		this.BackEdges = [];
 	}
-	
-	
+
+
 	this.setForegroundColor = function(objectID, color)
 	{
 		if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
 		{
 			this.Nodes[objectID].setForegroundColor(color);
-			
+
 		}
 	}
-	
+
 	this.setBackgroundColor = function(objectID, color)
 	{
 		if (this.Nodes[objectID] != null)
 		{
 			this.Nodes[objectID].setBackgroundColor(color);
-			
+
 		}
 	}
-	
+
 	this.setHighlight = function(nodeID, val)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -337,8 +337,8 @@ function ObjectManager()
 		}
 		this.Nodes[nodeID].setHighlight(val);
 	}
-	
-	
+
+
 	this.getHighlight = function(nodeID)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -359,7 +359,7 @@ function ObjectManager()
 		}
 		return this.Nodes[nodeID].getHighlightIndex();
 	}
-	
+
 	this.setWidth = function(nodeID, val)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -369,7 +369,7 @@ function ObjectManager()
 		}
 		this.Nodes[nodeID].setWidth(val);
 	}
-	
+
 	this.setHeight = function(nodeID, val)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -379,8 +379,8 @@ function ObjectManager()
 		}
 		this.Nodes[nodeID].setHeight(val);
 	}
-	
-	
+
+
 	this.getHeight = function(nodeID)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -390,7 +390,7 @@ function ObjectManager()
 		}
 		return this.Nodes[nodeID].getHeight();
 	}
-	
+
 	this.getWidth = function(nodeID)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -400,7 +400,7 @@ function ObjectManager()
 		}
 		return this.Nodes[nodeID].getWidth();
 	}
-	
+
 	this.backgroundColor = function(objectID)
 	{
 		if (this.Nodes[objectID] != null)
@@ -412,7 +412,7 @@ function ObjectManager()
 			return '#000000';
 		}
 	}
-	
+
 	this.foregroundColor = function(objectID)
 	{
 		if (this.Nodes[objectID] != null)
@@ -424,8 +424,8 @@ function ObjectManager()
 			return '#000000';
 		}
 	}
-	
-			
+
+
 	this.disconnect = function(objectIDfrom,objectIDto)
 	{
 		var undo = null;
@@ -462,7 +462,7 @@ function ObjectManager()
 		}
 		return undo;
 	}
-	
+
 	this.deleteIncident = function(objectID)
 	{
 		var undoStack = [];
@@ -475,7 +475,7 @@ function ObjectManager()
 				var deleted = this.Edges[objectID][i];
 				var node2ID = deleted.Node2.identifier();
 				undoStack.push(deleted.createUndoDisconnect());
-				
+
 				var len2 = this.BackEdges[node2ID].length;
 				for (var j = len2 - 1; j >=0; j--)
 				{
@@ -513,8 +513,8 @@ function ObjectManager()
 		}
 		return undoStack;
 	}
-	
-	
+
+
 	this.removeObject = function(ObjectID)
 	{
 		var OldObject = this.Nodes[ObjectID];
@@ -527,7 +527,7 @@ function ObjectManager()
 			this.Nodes[ObjectID] = null;
 		}
 	}
-	
+
 	this.getObject = function(objectID)
 	{
 		if (this.Nodes[objectID] == null || this.Nodes[objectID] == undefined)
@@ -535,10 +535,10 @@ function ObjectManager()
 			throw "getObject:Object with ID (" + String(objectID) + ") does not exist"
 		}
 		return this.Nodes[objectID];
-		
+
 	}
-	
-	
+
+
 	this.addCircleObject = function (objectID, objectLabel)
 	{
 			if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
@@ -548,16 +548,16 @@ function ObjectManager()
 			var newNode = new AnimatedCircle(objectID, objectLabel);
 			this.Nodes[objectID] = newNode;
 	}
-	
+
 	this.getNodeX = function(nodeID)
 	{
 		if (this.Nodes[nodeID] == null || this.Nodes[nodeID] == undefined)
 		{
 			throw "getting x position of an object that does not exit";
-		}	
+		}
 		return this.Nodes[nodeID].x;
 	}
-	
+
 	this.getTextWidth = function(text)
 	{
 		// TODO:  Need to make fonts more flexible, and less hardwired.
@@ -577,43 +577,43 @@ function ObjectManager()
 			for (var i = 0; i < strList.length; i++)
 			{
 				width = Math.max(width, this.ctx.measureText(strList[i]).width);
-			}		
+			}
 		}
-		
+
 		return width;
 	}
-	
+
 	this.setText = function(nodeID, text, index)
 	{
 		if (this.Nodes[nodeID] == null || this.Nodes[nodeID] == undefined)
 		{
 			return;
 			throw "setting text of an object that does not exit";
-		}			
+		}
 		this.Nodes[nodeID].setText(text, index, this.getTextWidth(text));
-		
+
 	}
-	
+
 	this.getText = function(nodeID, index)
 	{
 		if (this.Nodes[nodeID] == null || this.Nodes[nodeID] == undefined)
 		{
 			throw "getting text of an object that does not exit";
-		}			
+		}
 		return this.Nodes[nodeID].getText(index);
-		
+
 	}
-	
+
 	this.getNodeY = function(nodeID)
 	{
 		if (this.Nodes[nodeID] == null || this.Nodes[nodeID] == undefined)
 		{
 			throw "getting y position of an object that does not exit";
-		}	
+		}
 		return this.Nodes[nodeID].y;
 	}
 
-	
+
 	this.connectEdge = function(objectIDfrom, objectIDto, color, curve, directed, lab, connectionPoint)
 	{
 		var fromObj = this.Nodes[objectIDfrom];
@@ -634,19 +634,19 @@ function ObjectManager()
 		l.addedToScene = fromObj.addedToScene && toObj.addedToScene;
 		this.Edges[objectIDfrom].push(l);
 		this.BackEdges[objectIDto].push(l);
-		
+
 	}
-	
-	
+
+
 	this.setNull = function(objectID, nullVal)
 	{
 		if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
 		{
 			this.Nodes[objectID].setNull(nullVal);
-			
+
 		}
 	}
-	
+
 	this.getNull = function(objectID)
 	{
 		if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
@@ -655,9 +655,9 @@ function ObjectManager()
 		}
 		return false;  // TODO:  Error here?
 	}
-	
-	
-	
+
+
+
 	this.setEdgeColor = function(fromID, toID, color) // returns old color
 	{
 		var oldColor ="#000000";
@@ -672,43 +672,43 @@ function ObjectManager()
 					this.Edges[fromID][i].Node2 == this.Nodes[toID])
 				{
 					oldColor = this.Edges[fromID][i].color();
-					this.Edges[fromID][i].setColor(color);		
+					this.Edges[fromID][i].setColor(color);
 				}
 			}
-		}	
+		}
 		return oldColor;
-	}		
-	
+	}
+
 	this.alignTop = function(id1, id2)
 	{
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
 			this.Nodes[id2] == null || this.Nodes[id2] == undefined)
 		{
-			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);			
+			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);
 		}
 		this.Nodes[id1].alignTop(this.Nodes[id2]);
 	}
-	
+
 	this.alignLeft = function(id1, id2)
 	{
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
 			this.Nodes[id2] == null || this.Nodes[id2] == undefined)
 		{
-			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);			
+			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);
 		}
 		this.Nodes[id1].alignLeft(this.Nodes[id2]);
 	}
-	
+
 	this.alignRight = function(id1, id2)
 	{
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
 			this.Nodes[id2] == null || this.Nodes[id2] == undefined)
 		{
-			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);			
+			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);
 		}
 		this.Nodes[id1].alignRight(this.Nodes[id2]);
 	}
-	
+
 
 
 	this.getAlignRightPos = function(id1, id2)
@@ -716,7 +716,7 @@ function ObjectManager()
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
 			this.Nodes[id2] == null || this.Nodes[id2] == undefined)
 		{
-			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);			
+			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);
 		}
 	        return this.Nodes[id1].getAlignRightPos(this.Nodes[id2]);
 	}
@@ -726,11 +726,11 @@ function ObjectManager()
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
 			this.Nodes[id2] == null || this.Nodes[id2] == undefined)
 		{
-			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);			
+			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);
 		}
 	        return this.Nodes[id1].getAlignLeftPos(this.Nodes[id2]);
 	}
-	
+
 
 
 	this.alignBottom = function(id1, id2)
@@ -738,12 +738,12 @@ function ObjectManager()
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
 			this.Nodes[id2] == null || this.Nodes[id2] == undefined)
 		{
-			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);			
+			throw "Tring to align two nodes, one doesn't exist: " + String(id1) + "," + String(id2);
 		}
 		this.Nodes[id1].alignBottom(this.Nodes[id2]);
 	}
-	
-	
+
+
 	this.setEdgeHighlight = function(fromID, toID, val) // returns old color
 	{
 		var oldHighlight = false;
@@ -753,12 +753,12 @@ function ObjectManager()
 			var len = this.Edges[fromID].length;
 			for (var i = len - 1; i >= 0; i--)
 			{
-				if (this.Edges[fromID][i] != null && 
-					this.Edges[fromID][i] != undefined && 
+				if (this.Edges[fromID][i] != null &&
+					this.Edges[fromID][i] != undefined &&
 					this.Edges[fromID][i].Node2 == this.Nodes[toID])
 				{
 					oldHighlight = this.Edges[fromID][i].highlighted;
-					this.Edges[fromID][i].setHighlight(val);		
+					this.Edges[fromID][i].setHighlight(val);
 				}
 			}
 		}
@@ -770,12 +770,12 @@ function ObjectManager()
 		{
 			throw new Error("addLabelObject: Object Already Exists!");
 		}
-		
+
 		var newLabel = new AnimatedLabel(objectID, objectLabel, centering, this.getTextWidth(objectLabel));
 		this.Nodes[objectID] = newLabel;
 	}
-	
-		
+
+
 	this.addLinkedListObject = function(objectID, nodeLabel, width, height, linkPer, verticalOrientation, linkPosEnd, numLabels, backgroundColor, foregroundColor)
 	{
 		if (this.Nodes[objectID] != null)
@@ -786,14 +786,14 @@ function ObjectManager()
 		var newNode  = new AnimatedLinkedList(objectID, nodeLabel, width, height, linkPer, verticalOrientation, linkPosEnd, numLabels, backgroundColor, foregroundColor);
 		this.Nodes[objectID] = newNode;
 	}
-	
-	 
+
+
 	this.getNumElements = function(objectID)
 	{
 		return this.Nodes[objectID].getNumElements();
 	}
-	 
-	
+
+
 	this.setNumElements = function(objectID, numElems)
 	{
 		this.Nodes[objectID].setNumElements(numElems);
@@ -802,7 +802,7 @@ function ObjectManager()
 	 {
 		 backgroundColor = (backgroundColor == undefined) ? "#FFFFFF" : backgroundColor;
 		 foregroundColor = (foregroundColor == undefined) ? "#FFFFFF" : foregroundColor;
-		 
+
 		 if (this.Nodes[objectID] != null && Nodes[objectID] != undefined)
 		 {
 			 throw "addBTreeNode:Object with same ID already Exists!";
@@ -811,21 +811,22 @@ function ObjectManager()
 		 var newNode = new AnimatedBTreeNode(objectID,widthPerElem, height, numElems, backgroundColor, foregroundColor);
 		 this.Nodes[objectID] = newNode;
 	 }
-	
+
 	 this.addRectangleObject = function(objectID,nodeLabel, width, height, xJustify , yJustify , backgroundColor, foregroundColor)
 	 {
 		 if (this.Nodes[objectID] != null || this.Nodes[objectID] != undefined)
 		 {
+			 console.log(this.Nodes);
 			 throw new Error("addRectangleObject:Object with same ID already Exists!");
 		 }
 		 var newNode = new AnimatedRectangle(objectID, nodeLabel, width, height, xJustify, yJustify, backgroundColor, foregroundColor);
 		 this.Nodes[objectID] = newNode;
-		 
+
 	 }
-	 
-	 
-	
-	
+
+
+
+
 	this.setNodePosition = function(nodeID, newX, newY)
 	{
 		if (this.Nodes[nodeID] == null || this.Nodes[nodeID] == undefined)
@@ -835,7 +836,7 @@ function ObjectManager()
 		}
 		if (newX == undefined || newY == undefined)
 		{
-			
+
 			return;
 		}
 		this.Nodes[nodeID].x = newX;
@@ -843,16 +844,7 @@ function ObjectManager()
 		/* Don't need to dirty anything, since we repaint everything every frame
 		 (TODO:  Revisit if we do conditional redraws)
 		 }*/
-		
+
 	}
-	
+
 }
-
-
-
-
-
-
-
-
-	

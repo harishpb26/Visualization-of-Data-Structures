@@ -10,8 +10,10 @@
 	Declaration of structure
 {% endblock %}
 {% block button %}
-	<!--
-	<button onclick = "prevone()">Prev</button>
-	<button onclick = "nextone()">Next</button>
-	-->
+	<p class = "lead">
+		{% for line in text %}
+			{{line}}
+			<br>
+		{% endfor %}
+	</p>
 {% endblock %}

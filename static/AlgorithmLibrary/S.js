@@ -66,14 +66,15 @@ S.prototype.init = function(am, w, h)
 {
     // Call the unit function of our "superclass", which adds a couple of
     // listeners, and sets up the undo stack
+
     S.superclass.init.call(this, am, w, h);
 
     this.addControls();
-    this.setup();
+    //this.setup();
     // Useful for memory management
     this.nextIndex = 0;
     this.commands = [];
-    this.reset();
+    this.animationManager.resetAll();
     // TODO:  Add any code necessary to set up your own algorithm.  Initialize data
     // structures, etc.
 
