@@ -21,12 +21,14 @@ var_type = {}
 
 text = ""
 input_text = []
+
 @app.route('/', methods = ['POST'])
 def upload():
 	global text
 	text = request.form['insert_code']
 	global complist
 	complist = []
+	input_text.clear()
 	f = open("input.c","w")
 	for i in text.split('\n'):
 		if(i.strip()):

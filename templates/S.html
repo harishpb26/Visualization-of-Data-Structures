@@ -12,8 +12,9 @@
 {% block button %}
 	<p class = "lead">
 		{% for line in text %}
-			{{line}}
-			<br>
+			<div class = "each_line">
+				{{line}}
+			</div>
 		{% endfor %}
 	</p>
 {% endblock %}

@@ -130,12 +130,19 @@ function prevone(){
 }
 */
 
+
 var count = -1;
 console.log(maindict.length)
 
 S.prototype.nextone = function(){
   if(count < maindict.length - 1){
-      count++;
+    var R = document.getElementsByClassName('each_line');
+    count++;
+      if(count)
+      {
+        R[count-1].style.color = "black";
+      }
+      R[count].style.color = "red";
       //init();
       //currentAlg.reset();
       this.animationManager.resetAll();
@@ -150,6 +157,9 @@ S.prototype.nextone = function(){
 S.prototype.prevone = function(){
     if(count > 0){
         count--;
+        var R = document.getElementsByClassName('each_line');
+        R[count].style.color = "red";
+        R[count+1].style.color = "black";
         //init();
         //currentAlg.reset();
         this.animationManager.resetAll();
