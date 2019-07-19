@@ -10,16 +10,11 @@ body {
 	color: #000000;
 }
 
-.VisualizationMainPage #display_code {
-	margin: 0;
-	padding: 20px 30px;
-}
 
 .VisualizationMainPage #mainContent {
 	/*padding: 0 20px; /* remember that padding is the space inside the div box and margin is the space outside the div box */
 	background: #FFFFFF;
 }
-
 
 
 .VisualizationMainPage #container {
@@ -77,7 +72,8 @@ body {
 }
 
 
-.VisualizationMainPage #footer  A:visited { text-decoration:none;
+.VisualizationMainPage #footer  A:visited {
+	 text-decoration:none;
         color:ffcc33;
 }
 

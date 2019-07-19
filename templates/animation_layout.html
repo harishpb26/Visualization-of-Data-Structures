@@ -54,17 +54,18 @@
 
             <!-- Drawing canvas where all animation is done.  Note:  can be resized in code -->
 
-            <div id = "display_code" style = "float:left;">
-              {% block button %}{% endblock %}
-            </div>
 
-        <canvas id="canvas" width="2000" height="600"> </canvas>
+        <canvas id="canvas" width="1200" height="600" style="float:left;"></canvas>
+
+          <div id = "display_code" style="float:left;">
+            {% block button %}{% endblock %}
+          </div>
 
         <div id = "generalAnimationControlSection">
             <!-- Table for buttons to control general animation (play/pause/undo/etc)
             (filled in by javascript code, specifically AnimationMain.js)  -->
 
-            <table id="GeneralAnimationControls">  </table>
+            <table id="GeneralAnimationControls"></table>
         </div>
 
 

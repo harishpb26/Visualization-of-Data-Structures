@@ -20,22 +20,22 @@ var_dict = {}
 var_type = {}
 
 text = ""
-
+input_text = []
 @app.route('/', methods = ['POST'])
 def upload():
 	global text
 	text = request.form['insert_code']
 	global complist
 	complist = []
+	f = open("input.c","w")
 	for i in text.split('\n'):
 		if(i.strip()):
 			print(i)
+			input_text.append(i)
+			f.write(i + '\n')
 			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type)))
 	var_dict.clear()
 	var_type.clear()
-	print(complist)
-	f = open("input.c","w")
-	f.write(text)
 	f.close()
 
 	'''
@@ -58,8 +58,6 @@ def anime():
 	with open("var_type.json") as f:
 		data = json.load(f)
 	return json.dumps(data)
-
-# (xpos , ypos) - coordinate of label  struct
 
 
 @app.route('/animek')
@@ -121,7 +119,7 @@ def QueueArray():
 
 @app.route('/Structure')
 def Structure():
-	return render_template('S.html',text = text.split('\n'))
+	return render_template('S.html',text = input_text)
 
 
 if __name__ == '__main__':

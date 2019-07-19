@@ -7,7 +7,7 @@ var_value = {}
 #dictionary of types
 var_type = {}
 
-def cgrammarfunc(inp):
+def cgrammarfunc(inp, var_dict, var_type):
     import ply.lex as lex
     import ply.yacc as yacc
     import json
@@ -531,7 +531,7 @@ def cgrammarfunc(inp):
     #print(var_dict)
 
     #create json file
-    with open("var_dict.json","w") as f:
-    	json.dump(var_dict, f)
-
+    #with open("var_dict.json","w") as f:
+    	#json.dump(var_dict, f)
+    print(var_dict)
     return json.dumps(var_dict)
