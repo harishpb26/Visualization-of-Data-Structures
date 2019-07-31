@@ -3,7 +3,7 @@ import json
 import subprocess
 from flask import Flask, render_template, request
 from flask_cors import CORS
-from cgrammar import cgrammarfunc
+from cgrammar1 import cgrammarfunc
 
 app = Flask(__name__)
 CORS(app)
@@ -34,7 +34,7 @@ def upload():
 		if(i.strip()):
 			print(i)
 			input_text.append(i)
-			f.write(i + '\n')
+			f.write(i)
 			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type)))
 	var_dict.clear()
 	var_type.clear()
@@ -69,40 +69,65 @@ def animek():
 	ypos = 60
 	height = 50
 	width = 120
-	xvpos = xpos + width * 5
+	xppos = xpos + width * 4
+	yppos = ypos
+	xvpos = xppos + width * 2
 	yvpos = ypos
 	xtemp = xpos
 	ytemp = ypos
+	xptemp = xppos
+	yptemp = yppos
 	xvtemp = xvpos
 	yvtemp = yvpos
-	#data = {"a": ["int", 10], "p": ["struct Node", {"data": ["int", "?"], "link": ["struct Node*", "?"]}]}
+	#data = {'s': ['struct node*', {'link': ['struct node*', '?'], 'i': ['int', '?']}], 'p': ['int*', {'p': ['int*', 1]}], 'q': ['int*', 'p'], 'r': ['int*', 'p']}
 	temp = {}
 	for data in complist:
 		for key in data:
 			if(key in temp):
-				if(isinstance(data[key][1], dict)):
+				if(isinstance(data[key][1], dict) and isinstance(temp[key][1], str)):
 					data[key].insert(2,temp[key][2])
 					data[key].insert(3,temp[key][3])
 					for content in data[key][1]:
-						data[key][1][content].insert(3, temp[key][1][content][3])
-						data[key][1][content].insert(2, temp[key][1][content][2])
+						ytemp = ytemp + height
+						data[key][1][content].insert(3, iter)
+						data[key][1][content].insert(2, [xtemp,ytemp])
+						if("struct" in data[key][0]):
+							iter += 2
+						else:
+							iter+=1
+					ytemp = ytemp + height * 2
+					xtemp = xpos
+					temp[key] = data[key]
+				elif("*" in data[key][0]):
+					data[key].insert(2,temp[key][2])
+					data[key].insert(3,temp[key][3])
+					if(isinstance(data[key][1], dict)):
+						#print(data[key][1])
+						for content in data[key][1]:
+							#print(content)
+							data[key][1][content].insert(3, temp[key][1][content][3])
+							data[key][1][content].insert(2, temp[key][1][content][2])
 
 				else:
 					data[key].insert(2,temp[key][2])
 					data[key].insert(3, temp[key][3])
-
 			else:
-				if(isinstance(data[key][1], dict)):
-					data[key].insert(2, [xtemp, ytemp])
-					for content_key in data[key][1]:
-						ytemp = ytemp + height
-						data[key][1][content_key].insert(3, iter)
-						data[key][1][content_key].insert(2, [xtemp,ytemp])
-						iter += 2
-					ytemp = ytemp + height * 2
-					xtemp = xpos
+				if("*" in data[key][0]):
+					data[key].insert(2, [xptemp, yptemp])
+					if(isinstance(data[key][1], dict)):
+						for content_key in data[key][1]:
+							ytemp = ytemp + height
+							data[key][1][content_key].insert(3, iter)
+							data[key][1][content_key].insert(2, [xtemp,ytemp])
+							if("struct" in data[key][0]):
+								iter += 2
+							else:
+								iter+=1
+						ytemp = ytemp + height * 2
+						xtemp = xpos
+					yptemp = yptemp + height * 2
 					data[key].insert(3, iter)
-					iter += 1
+					iter += 2
 
 				else:
 					data[key].insert(2, [xvtemp,yvtemp])
