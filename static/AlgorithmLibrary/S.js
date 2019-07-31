@@ -84,12 +84,12 @@ S.prototype.addControls =  function()
 {
     this.controls = [];
     this.prevButton = addControlToAlgorithmBar("Button", "Prev");
-  	this.prevButton.onclick = this.prevone.bind(this);
-  	this.controls.push(this.prevButton);
+  this.prevButton.onclick = this.prevone.bind(this);
+  this.controls.push(this.prevButton);
 
     this.nextButton = addControlToAlgorithmBar("Button", "Next");
-  	this.nextButton.onclick = this.nextone.bind(this);
-  	this.controls.push(this.nextButton);
+  this.nextButton.onclick = this.nextone.bind(this);
+  this.controls.push(this.nextButton);
 }
 
 S.prototype.reset = function()
@@ -132,7 +132,7 @@ function prevone(){
 
 
 var count = -1;
-console.log(maindict.length)
+//console.log(maindict.length)
 
 S.prototype.nextone = function(){
   if(count < maindict.length - 1){
@@ -147,7 +147,7 @@ S.prototype.nextone = function(){
       //currentAlg.reset();
       this.animationManager.resetAll();
       currentAlg.setup(maindict[count]);
-      console.log(count);
+      //console.log(count);
   }
   else{
       alert("complete");
@@ -163,7 +163,7 @@ S.prototype.prevone = function(){
         //init();
         //currentAlg.reset();
         this.animationManager.resetAll();
-        console.log(count);
+        //console.log(count);
         currentAlg.setup(maindict[count]);
     }
     else{
@@ -174,36 +174,83 @@ S.prototype.prevone = function(){
 S.prototype.setup = function(dict){
     this.commands = [];
     //dict = {"a": ["int", 10, [80, 310], 0], "p": ["struct Node", {"link": ["struct Node*", "?", [80, 110], 2], "data": ["int", "?", [80, 160], 4]}, [80, 60], 6], "b": ["int", 4, [260.0, 310], 7]};
-    //dict = {"p": ["struct Node", {"link": ["struct Node*", "&a", [120, 110], 0], "data": ["int", 8, [120, 160], 2]}, [120, 60], 4], "a": ["int", 11, [720, 60], 5], "c": ["int", 8, [720, 185.0], 7]};
+    //dict = {"r": ["struct node*", "NULL", [520, 180.0], 6], "q": ["struct node*", "p", [520, 120.0], 4], "p": ["struct node*", {"data": ["int", 12, [120, 100], 0]}, [520, 60], 2]};
+    //console.log(dict)
     for(key in dict){
-          if(dict[key][0].indexOf("struct") >= 0)
-          {
-            //createStructure(key, dict[key][1], dict[key][2], dict[key][3]);
+        if(dict[key][0].indexOf("*") >= 0){
+
+            //draw a rect for a pointer
             this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] ,dict[key][2][1]);
+
+            //if it is null then store null in it
+            if(dict[key][1] == "NULL")
+              this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
+            else if(dict[key][1] == "?")
+              this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
+            else 
+              this.cmd("CreateRectangle",dict[key][3]+1, "", ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
+          //this.cmd("Connect", dict[key][3]+1,2);
+
+          //draw a structure if the type is a dict
+          if(typeof(dict[key][1]) == "object"){
             content = dict[key][1];
                 for(key in content){
-                  //console.log(content[key][0].indexOf("*"),typeof(content[key][1]));
-                    /*
-                    if(content[key][0].indexOf("*") >= 0){
-                      var s = content[key][1].slice(1);
-                      console.log(content[key][3]+1,dict[s][3]+1);
-                      this.cmd("Connect",content[key][3]+1,dict[s][3]+1);
-                      */
-
                     this.cmd("CreateRectangle", content[key][3], key, ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0],content[key][2][1]);
-                    this.cmd("CreateRectangle", content[key][3]+1,content[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
-                    //xpos = xpos + ARRAY_ELEM_WIDTH * 3;
+                    if(content[key][0].indexOf("struct") >= 0 && content[key][1] != "NULL" && content[key][1] !="?")
+                      this.cmd("CreateRectangle", content[key][3]+1, "", ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
+                    else
+                    this.cmd("CreateRectangle", content[key][3]+1, content[key][1] , ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
                 }
-            }
-            else{
-                this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] , dict[key][2][1]);
-                this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
-                //this.cmd("SetText",dict[key][3]+1 , "129");
-            }
+          }
+
+        }
+        else{
+            this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] , dict[key][2][1]);
+            this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
+            //this.cmd("SetText",dict[key][3]+1 , "129");
+        }
     }
-    //this.cmd("CreateLabel", 8, "structName[k]",TOP_LABEL_X, TOP_LABEL_Y);
+    //this.cmd("Connect", dict["p"][3]+1, 1);
+
+
+    //draw the arrow pointers
+    for(key in dict){
+      if(typeof(dict[key][1]) != "object" && dict[key][1] != "NULL"){
+          //console.log(dict[key][3], dict[dict[key][1]][3] )
+          if(dict[key][0].indexOf("struct") >= 0 && dict[key][1] != "?"){
+            var x = dict[dict[key][1]][1];
+            var y;
+            for (i in x){
+              if(x[i][0].indexOf("struct") < 0)
+              {
+                y = i;
+                break;
+              }
+            }
+            //console.log(dict[key][3]+1, x[y][3]);
+            this.cmd("Connect", dict[key][3]+1, x[y][3] + 1);
+          }
+      }
+      else if(typeof(dict[key][1]) == "object"){
+        for (i in dict[key][1]){
+          y = i;
+          x = dict[key][1][i]; 
+          if(x[0].indexOf("struct") >= 0 && x[1] != "NULL" && x[1] !="?")
+          {
+            l = Object.keys(dict[x[1]][1]);
+            console.log(l);
+            this.cmd("Connect", x[3]+1, dict[x[1]][1][l[0]][3] + 1);
+          }
+
+          //break;
+        }
+        //console.log(dict[key][3]+1, dict[key][1][y][3])
+        this.cmd("Connect", dict[key][3]+1, dict[key][1][y][3] + 1);
+      }
+    }
+
+
     //this.cmd("SetText",1,"");
-    //this.cmd("Connect",1,6);
     this.animationManager.StartNewAnimation(this.commands);
     this.animationManager.skipForward();
     this.animationManager.clearHistory();
