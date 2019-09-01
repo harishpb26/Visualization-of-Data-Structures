@@ -178,8 +178,11 @@ S.prototype.setup = function(dict){
     //console.log(dict)
     for(key in dict){
         if(dict[key][0].indexOf("*") >= 0){
+          //console.log(/^\d/.test(dict[key][1]));
 
-            //draw a rect for a pointer
+          //draw a rect for a pointer
+          // check if the first char of key is not an integer
+          if(isNaN(key[0])){
             this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] ,dict[key][2][1]);
 
             //if it is null then store null in it
@@ -187,9 +190,10 @@ S.prototype.setup = function(dict){
               this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
             else if(dict[key][1] == "?")
               this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
-            else 
+            else
               this.cmd("CreateRectangle",dict[key][3]+1, "", ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
           //this.cmd("Connect", dict[key][3]+1,2);
+          }
 
           //draw a structure if the type is a dict
           if(typeof(dict[key][1]) == "object"){
@@ -231,16 +235,27 @@ S.prototype.setup = function(dict){
             this.cmd("Connect", dict[key][3]+1, x[y][3] + 1);
           }
       }
-      else if(typeof(dict[key][1]) == "object"){
+      // if the first elem is a structure and its key doesnt start with an int
+      else if(typeof(dict[key][1]) == "object" && isNaN(key[0])){
         for (i in dict[key][1]){
           y = i;
-          x = dict[key][1][i]; 
+          x = dict[key][1][i];
+          //console.log(i, x);
           if(x[0].indexOf("struct") >= 0 && x[1] != "NULL" && x[1] !="?")
           {
             l = Object.keys(dict[x[1]][1]);
-            console.log(l);
-            this.cmd("Connect", x[3]+1, dict[x[1]][1][l[0]][3] + 1);
+            console.log(x);
+            var k;
+            for(r in dict[x[1]][1]){
+              k = r;
+              break;
+            }
+            //console.log(l);
+            //console.log(dict[dict[x[1]][1]][1][k]);
+            this.cmd("Connect", x[3]+1, dict[x[1]][1][k][3] + 1);
+            //this.cmd("Connect", x[3]+1, dict[x[1]][1][l[0]][3] + 1);
           }
+
 
           //break;
         }
