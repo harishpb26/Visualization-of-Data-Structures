@@ -3,7 +3,7 @@ import json
 import subprocess
 from flask import Flask, render_template, request
 from flask_cors import CORS
-from cgrammar1 import cgrammarfunc
+from cgrammar import cgrammarfunc
 
 app = Flask(__name__)
 CORS(app)
@@ -21,9 +21,11 @@ var_type = {}
 
 text = ""
 input_text = []
+counter = {"dcount"	:	0}
 
 @app.route('/', methods = ['POST'])
 def upload():
+
 	global text
 	text = request.form['insert_code']
 	global complist
@@ -34,8 +36,9 @@ def upload():
 		if(i.strip()):
 			print(i)
 			input_text.append(i)
-			f.write(i)
-			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type)))
+			f.write(i + '\n')
+			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type, counter)))
+			print('\n')
 	var_dict.clear()
 	var_type.clear()
 	f.close()

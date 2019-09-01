@@ -1,4 +1,4 @@
-def cgrammarfunc(inp, var_dict, var_type):
+def cgrammarfunc(inp, var_dict, var_type, counter):
 
     import ply.lex as lex
     import ply.yacc as yacc
@@ -351,8 +351,6 @@ def cgrammarfunc(inp, var_dict, var_type):
 
 
 
-
-
     def p_pointer_init(p):
         '''
         pointer_init : MULT ID ASSIGN expression
@@ -434,7 +432,6 @@ def cgrammarfunc(inp, var_dict, var_type):
         '''
         struct_pointer_assign_dynamic	:	STRUCT ID MULT ID ASSIGN MALLOC LPAREN size2 RPAREN
         '''
-        #var_type[p[4]] = p[2] + "*"
         var_dict[p[4]] = [p[1] + " " + p[2] + p[3]]
         tempdict = copy.deepcopy(var_type[p[2]])
         var_dict[p[4]].insert(1,tempdict)
@@ -445,8 +442,14 @@ def cgrammarfunc(inp, var_dict, var_type):
         dynamic_init :  ID ASSIGN MALLOC LPAREN size2 RPAREN
 
         '''
-        #print("dynamically allocated ",p[1]," with malloc of size", p[5])
-        #print(var_type[p[5]])
+        # check if identifier is already present in var_dict which was previously declared with malloc
+        if(p[1] in var_dict and isinstance(var_dict[p[1]][1], dict)):
+        #if(p[1] in var_dict):
+            counter["dcount"] += 1
+            var_dict[str(counter["dcount"]) + p[1]] = copy.deepcopy(var_dict[p[1]])
+            for i in var_dict:
+                if(var_dict[i][1] == p[1]):
+                    var_dict[i][1] = str(counter["dcount"]) + p[1]
         tempdict = copy.deepcopy(var_type[p[5]])
         var_dict[p[1]][1] = tempdict
 
@@ -460,9 +463,22 @@ def cgrammarfunc(inp, var_dict, var_type):
         x = var_dict[p[1]][1]
         if(x != '?' and x != 'NULL'):
             if(isinstance(x, dict)):
-                x[p[3]][1] = p[5]
+                if(isinstance(p[5], str)):
+                    if(isinstance(var_dict[p[5]][1], dict)):
+                        x[p[3]][1] = p[5]
+                    else:
+                        x[p[3]][1] = var_dict[p[5]][1]
+                else:
+                    x[p[3]][1] = p[5]
+
             else:
-                var_dict[x][1][p[3]][1] = p[5]
+                if(isinstance(p[5], str)):
+                    if(isinstance(var_dict[p[5]][1], dict)):
+                        var_dict[x][1][p[3]][1] = p[5]
+                    else:
+                        var_dict[x][1][p[3]][1] = var_dict[p[5]][1]
+                else:
+                    var_dict[x][1][p[3]][1] = p[5]
 
         """
         x = var_dict[p[1]][1]
@@ -639,9 +655,8 @@ def cgrammarfunc(inp, var_dict, var_type):
                     var_dict[i][1] = "?"
         else:
             x = var_dict[p[3]][1]
-            print(x)
             var_dict[p[3]][1] = "?"
-            var_dict[x][1] = "?"
+            del var_dict[x]
             for i in var_dict:
                 if(var_dict[i][1] == x):
                     var_dict[i][1] = "?"
