@@ -21,6 +21,7 @@ var_type = {}
 
 text = ""
 input_text = []
+flag = {"dflag" : 0}
 counter = {"dcount"	:	0}
 
 @app.route('/', methods = ['POST'])
@@ -37,15 +38,15 @@ def upload():
 			print(i)
 			input_text.append(i)
 			f.write(i + '\n')
-			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type, counter)))
+			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type, counter, flag)))
 			print('\n')
+	print(input_text)
 	var_dict.clear()
 	var_type.clear()
 	f.close()
 
 	'''
 	p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE,check = True)
-
 	p = subprocess.Popen(['python','cgrammar.py'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 	p = subprocess.check_output(['python','cgrammar.py'])
 	stdout, stderr = p.communicate()
@@ -153,4 +154,4 @@ def Structure():
 
 
 if __name__ == '__main__':
-    app.run(debug = True,port = 8080)
+    app.run(debug = True,port = 8080, use_reloader = False)

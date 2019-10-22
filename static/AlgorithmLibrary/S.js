@@ -186,27 +186,26 @@ S.prototype.setup = function(dict){
             this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] ,dict[key][2][1]);
 
             //if it is null then store null in it
-            if(dict[key][1] == "NULL")
-              this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
-            else if(dict[key][1] == "?")
+            if(dict[key][1] == "NULL" || dict[key][1] == "?")
               this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
             else
               this.cmd("CreateRectangle",dict[key][3]+1, "", ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
-          //this.cmd("Connect", dict[key][3]+1,2);
           }
-
-          //draw a structure if the type is a dict
-          if(typeof(dict[key][1]) == "object"){
+          //draw a structure box if the type is a dict and is structure
+          if(typeof(dict[key][1]) == "object" && dict[key][0].indexOf("struct") >= 0){
             content = dict[key][1];
                 for(key in content){
                     this.cmd("CreateRectangle", content[key][3], key, ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0],content[key][2][1]);
                     if(content[key][0].indexOf("struct") >= 0 && content[key][1] != "NULL" && content[key][1] !="?")
                       this.cmd("CreateRectangle", content[key][3]+1, "", ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
                     else
-                    this.cmd("CreateRectangle", content[key][3]+1, content[key][1] , ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
+                      this.cmd("CreateRectangle", content[key][3]+1, content[key][1] , ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
                 }
           }
-
+          else if(typeof(dict[key][1]) == "object"){
+            content = dict[key][1];
+            this.cmd("CreateRectangle", content[key][3], content[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,content[key][2][0]+ARRAY_ELEM_WIDTH,content[key][2][1]);
+          }
         }
         else{
             this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] , dict[key][2][1]);
@@ -214,13 +213,12 @@ S.prototype.setup = function(dict){
             //this.cmd("SetText",dict[key][3]+1 , "129");
         }
     }
-    //this.cmd("Connect", dict["p"][3]+1, 1);
-
 
     //draw the arrow pointers
     for(key in dict){
+      // if the first element is not an dict and not null
       if(typeof(dict[key][1]) != "object" && dict[key][1] != "NULL"){
-          //console.log(dict[key][3], dict[dict[key][1]][3] )
+          //console.log(dict[key][3], dict[dict[key][1]][3])
           if(dict[key][0].indexOf("struct") >= 0 && dict[key][1] != "?"){
             var x = dict[dict[key][1]][1];
             var y;
@@ -234,9 +232,25 @@ S.prototype.setup = function(dict){
             //console.log(dict[key][3]+1, x[y][3]);
             this.cmd("Connect", dict[key][3]+1, x[y][3] + 1);
           }
+          // check if it is pointer and its value is defined
+          else if(dict[key][0].indexOf("*") >= 0 && dict[key][1] != "?"){
+            // k contains the var the pointer points to
+            var k = dict[key][1].substring(4, );
+            this.cmd("Connect", dict[key][3] + 1, dict[k][3] + 1);
+          }
       }
-      // if the first elem is a structure and its key doesnt start with an int
-      else if(typeof(dict[key][1]) == "object" && isNaN(key[0])){
+
+      // if first element is a dict and it not struct but a pointer
+      else if(typeof(dict[key][1]) == "object" && dict[key][0].indexOf("*") >= 0 && dict[key][0].indexOf("struct") < 0){
+        //console.log("in else if part");
+        //if(dict[key][1][key][1] != "NULL" && dict[key][1][key][1] != "?"){
+          //var k = dict[key][1][key][1]
+          this.cmd("Connect", dict[key][3] +1, dict[key][1][key][3]);
+        //}
+      }
+
+      // if the first elem is a dict and its key doesnt start with an int
+      else if(typeof(dict[key][1]) == "object" &&  isNaN(key[0])){
         for (i in dict[key][1]){
           y = i;
           x = dict[key][1][i];
@@ -255,15 +269,11 @@ S.prototype.setup = function(dict){
             this.cmd("Connect", x[3]+1, dict[x[1]][1][k][3] + 1);
             //this.cmd("Connect", x[3]+1, dict[x[1]][1][l[0]][3] + 1);
           }
-
-
-          //break;
         }
         //console.log(dict[key][3]+1, dict[key][1][y][3])
-        this.cmd("Connect", dict[key][3]+1, dict[key][1][y][3] + 1);
+        this.cmd("Connect", dict[key][3] + 1, dict[key][1][y][3] + 1);
       }
     }
-
 
     //this.cmd("SetText",1,"");
     this.animationManager.StartNewAnimation(this.commands);
