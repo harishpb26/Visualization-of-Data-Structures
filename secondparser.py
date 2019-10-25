@@ -174,7 +174,6 @@ def secondparser(stat, var_dict, var_type):
 
     '''
 
-
     precedence = (
         ('left', 'PLUS', 'MINUS'),
         ('left', 'MULT', 'DIVIDE')
@@ -233,10 +232,8 @@ def secondparser(stat, var_dict, var_type):
             p[0] = str(p[1]) + str(p[2])
         else:
             p[0] = p[1]
-            print("return value of the condition in secondparser", p[0])
+            #print("return value of the condition in secondparser", p[0])
             condition[0] = p[0]
-            #print(condition)
-
 
 
     def p_primary_expression2(p):
@@ -246,13 +243,13 @@ def secondparser(stat, var_dict, var_type):
         if(flag):
             p[0] = str(p[1])
 
+
     def p_var_declare_without_assign(p):
         '''
         var_declare	:	INT ID
                     |	FLOAT ID
         '''
         if(p[2] not in var_dict):
-            #var_type[p[2]] = p[1]
             var_dict[p[2]] = [p[1]]
             var_dict[p[2]].insert(1,'?')
 
@@ -262,19 +259,11 @@ def secondparser(stat, var_dict, var_type):
         var_declare	:	INT	ID ASSIGN expression
                     |	FLOAT ID ASSIGN expression
         '''
-        #print("variable ", p[2], "of type ", p[1])
         if(flag):
             p[0] = str(p[1]) + " " + str(p[2]) + str(p[3]) + str(p[4])
         else:
             if(p[2] not in var_dict):
-                #var_type[p[2]] = p[1]
                 var_dict[p[2]] = [p[1]]
-            '''
-            if(isinstance(p[4],tuple)):
-                v = var_dict[p[4][1]][1]
-                var_dict[p[2]].insert(1,v)
-            else:
-            '''
             var_dict[p[2]].insert(1,p[4])
 
 
@@ -283,12 +272,6 @@ def secondparser(stat, var_dict, var_type):
         var_assign	:	ID ASSIGN expression
                     |   ID ASSIGN NULL
 
-        '''
-        '''
-        if(isinstance(p[3],tuple)):
-            v = var_dict[p[3][1]][1]
-            var_dict[p[1]][1] = v
-        else:
         '''
         if(flag == 0):
             if("*" in var_dict[p[1]][0] and "struct" in var_dict[p[1]][0]):
@@ -304,7 +287,7 @@ def secondparser(stat, var_dict, var_type):
                     else:
                         var_dict[p[1]][1] = x
                 else:
-                    print("in else1")
+                    #print("in else1")
                     var_dict[p[1]][1] = p[3]
 
 
@@ -338,8 +321,6 @@ def secondparser(stat, var_dict, var_type):
                                         | FLOAT MULT ID
         '''
 
-        #print("pointer ", p[3] , " of type ", p[1])
-        #var_type[p[3]] = p[1] + "*"
         var_dict[p[3]] = [p[1]+p[2]]
         var_dict[p[3]].insert(1,'?')
 
@@ -358,7 +339,6 @@ def secondparser(stat, var_dict, var_type):
                         | FLOAT MULT ID ASSIGN ADDR ID
         '''
 
-        #print("pointer ", p[3] , " of type ", p[1])
         var_dict[p[3]] = [p[1] + p[2]]
         var_dict[p[3]].insert(1,"addr" + p[6])
 
@@ -415,7 +395,6 @@ def secondparser(stat, var_dict, var_type):
 
         '''
         var_dict[p[3]] = [p[1] + "*"]
-        #print("dynamically allocated ",p[3]," with malloc of size", p[7])
         var_dict[p[3]].insert(1,{p[3] : [p[1]+p[2] , "?"]})
 
 
@@ -431,7 +410,6 @@ def secondparser(stat, var_dict, var_type):
         '''
         struct_pointer_declare	:	STRUCT ID MULT ID
         '''
-        #var_type[p[4]] = p[2] + "*"
         var_dict[p[4]] = [p[1] + " " + p[2] + p[3]]
         #var_dict[p[4]].insert(1,var_type[p[2]])
         #tempdict = copy.deepcopy(var_type[p[2]])
@@ -444,7 +422,6 @@ def secondparser(stat, var_dict, var_type):
                                 |   STRUCT ID MULT ID ASSIGN NULL
 
         '''
-
         if(flag):
             p[0] = str(p[1]) + " " + str(p[2]) + str(p[3]) + " " + str(p[4]) + " " + str(p[5]) + " " + str(p[6])
         else:
@@ -463,6 +440,7 @@ def secondparser(stat, var_dict, var_type):
             else:
                 var_dict[p[4]].insert(1,p[6])
 
+
     def p_struct_pointer_assign_dynamic(p):
         '''
         struct_pointer_assign_dynamic	:	STRUCT ID MULT ID ASSIGN MALLOC LPAREN size2 RPAREN
@@ -479,7 +457,6 @@ def secondparser(stat, var_dict, var_type):
         '''
         # check if identifier is already present in var_dict which was previously declared with malloc
         if(p[1] in var_dict and isinstance(var_dict[p[1]][1], dict)):
-        #if(p[1] in var_dict):
             counter["dcount"] += 1
             var_dict[str(counter["dcount"]) + p[1]] = copy.deepcopy(var_dict[p[1]])
             for i in var_dict:
@@ -514,6 +491,7 @@ def secondparser(stat, var_dict, var_type):
                         var_dict[x][1][p[3]][1] = var_dict[p[5]][1]
                 else:
                     var_dict[x][1][p[3]][1] = p[5]
+
 
     def p_size1(p):
         '''
@@ -570,10 +548,7 @@ def secondparser(stat, var_dict, var_type):
                 |	FLOAT ID SEMICOLON content
                 |	FLOAT ID SEMICOLON
                 |	INT ID SEMICOLON
-
-
         '''
-
         try:
             if(p[2] not in var_type):
                 det.append(p[2] + ":" + p[1])
@@ -594,6 +569,7 @@ def secondparser(stat, var_dict, var_type):
                 #print(det)
         except:
             pass
+
 
     def p_expression(p):
         '''
@@ -811,9 +787,7 @@ def secondparser(stat, var_dict, var_type):
         while : WHILE LPAREN cond RPAREN LEFTBRACE seen_a primary_expression RIGHTBRACE
         '''
         loop = dict()
-        print("inside secondparser cond as a string", p[3])
         # create var loop with all elements of var_dict
-        print("inside secondparser block as a string", p[7])
         loop = createloop(loop, var_dict)
         #print("at 1", flag)
         while(eval(p[3], loop)):
@@ -828,13 +802,13 @@ def secondparser(stat, var_dict, var_type):
         flag = 0
 
 
-
     def p_seen_a(p):
         '''
         seen_a  :   empty
         '''
         global flag
         flag = 1
+
 
     def p_cond(p):
         '''
@@ -862,10 +836,7 @@ def secondparser(stat, var_dict, var_type):
 
     #build the parser
     parser = yacc.yacc()
-    #print("parser", parser, type(parser))
     print("input to secondparser", stat)
     parser.parse(stat, lexer = lexer)
-    print("dict inside secondparser", var_dict)
+    print(var_dict)
     return condition
-
-#secondparser("k > 1;", {'k': ['int', 1]}, {})

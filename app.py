@@ -40,7 +40,6 @@ def upload():
 			f.write(i + '\n')
 			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type, counter, flag)))
 			print('\n')
-	print(input_text)
 	var_dict.clear()
 	var_type.clear()
 	f.close()
