@@ -1,6 +1,9 @@
-def secondparser(stat, var_dict, var_type):
+def secondparser(stat, var_dict, var_type,counter):
     flag = 0
+    import copy
+    var_dict = copy.deepcopy(var_dict)
     condition = [0]
+    line_list = []
     import ply.lex as lex
     import ply.yacc as yacc
     import json
@@ -83,7 +86,7 @@ def secondparser(stat, var_dict, var_type):
     t_GREATER = r'>'
     t_LESSEREQ = r'<='
     t_GREATEREQ = r'>='
-    t_AND = r'&&'
+    t_AND = r'\&\&'
     t_OR = r'\|\|'
     t_NOT = r'!'
     t_INCREMENT = r'\+\+'
@@ -175,8 +178,14 @@ def secondparser(stat, var_dict, var_type):
     '''
 
     precedence = (
+        ('left', 'ARROW'),
+        ('left', 'OR'),
+        ('left', 'AND'),
+        ('left', 'EQUAL', 'NOTEQUAL'),
+        ('left', 'LESSER', 'LESSEREQ', 'GREATER', 'GREATEREQ'),
         ('left', 'PLUS', 'MINUS'),
-        ('left', 'MULT', 'DIVIDE')
+        ('left', 'MULT', 'DIVIDE'),
+        ('left', 'LPAREN', 'RPAREN', 'INCREMENT', 'DECREMENT')
     )
 
 
@@ -252,6 +261,7 @@ def secondparser(stat, var_dict, var_type):
         if(p[2] not in var_dict):
             var_dict[p[2]] = [p[1]]
             var_dict[p[2]].insert(1,'?')
+            line_list.append(copy.deepcopy(var_dict))
 
 
     def p_var_declare(p):
@@ -265,6 +275,7 @@ def secondparser(stat, var_dict, var_type):
             if(p[2] not in var_dict):
                 var_dict[p[2]] = [p[1]]
             var_dict[p[2]].insert(1,p[4])
+            line_list.append(copy.deepcopy(var_dict))
 
 
     def p_var_assign(p):
@@ -308,6 +319,8 @@ def secondparser(stat, var_dict, var_type):
 
             else:
                 var_dict[p[1]][1] = p[3]
+            print("in second", copy.deepcopy(var_dict))
+            line_list.append(copy.deepcopy(var_dict))
         else:
             if(p[3]!= "NULL"):
                 p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -323,6 +336,7 @@ def secondparser(stat, var_dict, var_type):
 
         var_dict[p[3]] = [p[1]+p[2]]
         var_dict[p[3]].insert(1,'?')
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_pointer_assign(p):
@@ -331,6 +345,7 @@ def secondparser(stat, var_dict, var_type):
 
         '''
         var_dict[p[1]][1] = "addr" + p[4]
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_pointer_declare(p):
@@ -341,6 +356,7 @@ def secondparser(stat, var_dict, var_type):
 
         var_dict[p[3]] = [p[1] + p[2]]
         var_dict[p[3]].insert(1,"addr" + p[6])
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_pointer_declare1(p):
@@ -362,6 +378,7 @@ def secondparser(stat, var_dict, var_type):
                 var_dict[p[3]].insert(1,x)
         else:
             var_dict[p[3]].insert(1,"?")
+        line_list.append(copy.deepcopy(var_dict))
 
 
 
@@ -383,6 +400,7 @@ def secondparser(stat, var_dict, var_type):
 
         else:
             x[p[2]][1] = p[4]
+        line_list.append(copy.deepcopy(var_dict))
 
 
 
@@ -396,6 +414,7 @@ def secondparser(stat, var_dict, var_type):
         '''
         var_dict[p[3]] = [p[1] + "*"]
         var_dict[p[3]].insert(1,{p[3] : [p[1]+p[2] , "?"]})
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_dynamic_init1(p):
@@ -404,6 +423,7 @@ def secondparser(stat, var_dict, var_type):
                         |  ID ASSIGN MALLOC LPAREN size3 RPAREN
         '''
         var_dict[p[1]][1] = {p[1] : [var_dict[p[1]][0] , "?"]}
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_struct_pointer_declare(p):
@@ -414,6 +434,7 @@ def secondparser(stat, var_dict, var_type):
         #var_dict[p[4]].insert(1,var_type[p[2]])
         #tempdict = copy.deepcopy(var_type[p[2]])
         var_dict[p[4]].insert(1,'?')
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_struct_pointer_assign(p):
@@ -439,6 +460,7 @@ def secondparser(stat, var_dict, var_type):
 
             else:
                 var_dict[p[4]].insert(1,p[6])
+            line_list.append(copy.deepcopy(var_dict))
 
 
     def p_struct_pointer_assign_dynamic(p):
@@ -448,6 +470,7 @@ def secondparser(stat, var_dict, var_type):
         var_dict[p[4]] = [p[1] + " " + p[2] + p[3]]
         tempdict = copy.deepcopy(var_type[p[2]])
         var_dict[p[4]].insert(1,tempdict)
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_dynamic_init(p):
@@ -456,14 +479,21 @@ def secondparser(stat, var_dict, var_type):
 
         '''
         # check if identifier is already present in var_dict which was previously declared with malloc
-        if(p[1] in var_dict and isinstance(var_dict[p[1]][1], dict)):
-            counter["dcount"] += 1
-            var_dict[str(counter["dcount"]) + p[1]] = copy.deepcopy(var_dict[p[1]])
-            for i in var_dict:
-                if(var_dict[i][1] == p[1]):
-                    var_dict[i][1] = str(counter["dcount"]) + p[1]
-        tempdict = copy.deepcopy(var_type[p[5]])
-        var_dict[p[1]][1] = tempdict
+        if(flag):
+            p[0] = str(p[1]) + " " + str(p[2]) + str(p[3]) +str(p[4]) + " " + str(p[5]) + " " + str(p[6])
+        else:
+            if(p[1] in var_dict and isinstance(var_dict[p[1]][1], dict)):
+                counter["dcount"] += 1
+                var_dict[str(counter["dcount"]) + p[1]] = copy.deepcopy(var_dict[p[1]])
+                for i in var_dict:
+                    if(var_dict[i][1] == p[1]):
+                        var_dict[i][1] = str(counter["dcount"]) + p[1]
+            print(var_dict)
+            name = var_dict[p[1]][0].strip("struct")
+            name = name.strip("*").strip()
+            tempdict = copy.deepcopy(var_type[name])
+            var_dict[p[1]][1] = tempdict
+            line_list.append(copy.deepcopy(var_dict))
 
 
     def p_struct_assign1(p):
@@ -491,6 +521,7 @@ def secondparser(stat, var_dict, var_type):
                         var_dict[x][1][p[3]][1] = var_dict[p[5]][1]
                 else:
                     var_dict[x][1][p[3]][1] = p[5]
+        line_list.append(copy.deepcopy(var_dict))
 
 
     def p_size1(p):
@@ -538,6 +569,7 @@ def secondparser(stat, var_dict, var_type):
                 var_type[p[2]][var] = [ty,'?']
             del det[:]
             #print(det)
+        line_list.append(copy.deepcopy(var_dict))
 
     det = []
 
@@ -708,6 +740,47 @@ def secondparser(stat, var_dict, var_type):
             else:
                 p[0] = 0
 
+    def p_expression_and(p):
+        '''
+        expression	:	expression AND expression
+
+        '''
+        if(flag):
+            p[0] = str(p[1]) + str(p[2]) + str(p[3])
+        else:
+            if(p[1] and p[3]):
+                p[0] = 1
+            else:
+                p[0] = 0
+
+
+    def p_expression_or(p):
+        '''
+        expression	:	expression OR expression
+
+        '''
+        if(flag):
+            p[0] = str(p[1]) + str(p[2]) + str(p[3])
+        else:
+            if(p[1] or p[3]):
+                p[0] = 1
+            else:
+                p[0] = 0
+
+
+    def p_expression_not(p):
+        '''
+        expression	:	NOT expression
+
+        '''
+        if(flag):
+            p[0] = str(p[1]) + str(p[2])
+        else:
+            if(not(p[2])):
+                p[0] = 1
+            else:
+                p[0] = 0
+
 
     def p_expression_var(p):
         '''
@@ -757,6 +830,19 @@ def secondparser(stat, var_dict, var_type):
         '''
         empty	:
         '''
+        if(flag):
+            p[0] = ""
+
+    def p_null(p):
+        '''
+        expression	: NULL
+        '''
+        if(flag):
+            p[0] = str(p[1])
+        else:
+            p[0] = p[1]
+
+
     def p_free(p):
         '''
         free : FREE LPAREN ID RPAREN
@@ -836,7 +922,7 @@ def secondparser(stat, var_dict, var_type):
 
     #build the parser
     parser = yacc.yacc()
-    print("input to secondparser", stat)
+    #print("input to secondparser", stat)
     parser.parse(stat, lexer = lexer)
-    print(var_dict)
-    return condition
+    #print(var_dict)
+    return [condition, line_list]

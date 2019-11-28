@@ -50,7 +50,7 @@ req.onload = function(){
   maindict = JSON.parse(req.responseText);
 };
 req.send();
-//console.log(maindict);
+console.log(maindict);
 
 
 function S(am, w, h)
@@ -135,6 +135,16 @@ var count = -1;
 //console.log(maindict.length)
 
 S.prototype.nextone = function(){
+  if(count < maindict.length){
+      this.animationManager.resetAll();
+      currentAlg.setup(maindict[count]);
+      count++;
+      console.log(count,maindict.length,maindict[count]);
+  }
+  else{
+    alert("reached end");
+  }
+  /*
   if(count < maindict.length - 1){
     var R = document.getElementsByClassName('each_line');
     count++;
@@ -152,9 +162,19 @@ S.prototype.nextone = function(){
   else{
       alert("complete");
   }
+  */
 }
 
 S.prototype.prevone = function(){
+    if(count > 0){
+        count--;
+        this.animationManager.resetAll();
+        currentAlg.setup(maindict[count]);
+    }
+    else{
+      alert("start");
+    }
+    /*
     if(count > 0){
         count--;
         var R = document.getElementsByClassName('each_line');
@@ -169,6 +189,7 @@ S.prototype.prevone = function(){
     else{
         alert("beginning");
     }
+    */
 }
 
 S.prototype.setup = function(dict){
@@ -186,7 +207,7 @@ S.prototype.setup = function(dict){
             this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] ,dict[key][2][1]);
 
             //if it is null then store null in it
-            if(dict[key][1] == "NULL" || dict[key][1] == "?")
+            if(dict[key][1] == "NULL" || dict[key][1] == "?" || dict[key][1] == "$")
               this.cmd("CreateRectangle",dict[key][3]+1, dict[key][1], ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
             else
               this.cmd("CreateRectangle",dict[key][3]+1, "", ARRAY_ELEM_WIDTH, ARRAY_ELEM_HEIGHT,dict[key][2][0],dict[key][2][1]+ARRAY_ELEM_HEIGHT);
@@ -214,11 +235,20 @@ S.prototype.setup = function(dict){
         }
     }
 
+
+
+     //{'head': ['struct node*', '1newnode', [600, 60], 0],
+     //'newnode': ['struct node*', {'link': ['struct node*', '?', [120, 110], 6],
+     //'data': ['int', '?', [120, 160], 8]}, [600, 160], 2],
+     //'len': ['int', 1, [840, 60], 4],
+     // '1newnode': ['struct node*', {'link': ['struct node*', 'NULL', [120, 310], 10],
+     //'data': ['int', 0, [120, 360], 12]}, [600, 260], 14]}
     //draw the arrow pointers
     for(key in dict){
       // if the first element is not an dict and not null
-      if(typeof(dict[key][1]) != "object" && dict[key][1] != "NULL"){
+      if(typeof(dict[key][1]) != "object" && dict[key][1] != "NULL" && dict[key][1]!="$"){
           //console.log(dict[key][3], dict[dict[key][1]][3])
+          console.log("in if");
           if(dict[key][0].indexOf("struct") >= 0 && dict[key][1] != "?"){
             var x = dict[dict[key][1]][1];
             var y;
@@ -233,7 +263,7 @@ S.prototype.setup = function(dict){
             this.cmd("Connect", dict[key][3]+1, x[y][3] + 1);
           }
           // check if it is pointer and its value is defined
-          else if(dict[key][0].indexOf("*") >= 0 && dict[key][1] != "?"){
+          else if(dict[key][0].indexOf("*") >= 0 && dict[key][1] != "?" && dict[key][1]!="$"){
             // k contains the var the pointer points to
             var k = dict[key][1].substring(4, );
             this.cmd("Connect", dict[key][3] + 1, dict[k][3] + 1);
@@ -251,6 +281,7 @@ S.prototype.setup = function(dict){
 
       // if the first elem is a dict and its key doesnt start with an int
       else if(typeof(dict[key][1]) == "object" &&  isNaN(key[0])){
+      //else if(typeof(dict[key][1]) == "object"){
         for (i in dict[key][1]){
           y = i;
           x = dict[key][1][i];
@@ -258,7 +289,7 @@ S.prototype.setup = function(dict){
           if(x[0].indexOf("struct") >= 0 && x[1] != "NULL" && x[1] !="?")
           {
             l = Object.keys(dict[x[1]][1]);
-            console.log(x);
+            //console.log(x);
             var k;
             for(r in dict[x[1]][1]){
               k = r;
@@ -272,6 +303,30 @@ S.prototype.setup = function(dict){
         }
         //console.log(dict[key][3]+1, dict[key][1][y][3])
         this.cmd("Connect", dict[key][3] + 1, dict[key][1][y][3] + 1);
+      }
+      //{'head': ['struct node*', '2newnode'],
+      // 'len': ['int', 2],
+      //'2newnode': ['struct node*', {'link': ['struct node*', '1newnode'], 'data': ['int', 1]}],
+      // '1newnode': ['struct node*', {'link': ['struct node*', 'NULL'], 'data': ['int', 0]}],
+      //'newnode': ['struct node*', {'link': ['struct node*', '?'], 'data': ['int', '?']}]}
+      else if(typeof(dict[key][1]) == "object" &&  !(isNaN(key[0]))){
+          var x = dict[key][1]
+          //console.log(key, x)
+          for(k in x){
+              if(x[k][0].indexOf("struct") >= 0 && x[k][1] != "NULL" && x[k][1] != "?"){
+                  var n = x[k][1]
+                  if(typeof(dict[n][1]) == "object"){
+                    console.log("this is another heap var", x[k][1]);
+                    for(r in dict[n][1]){
+                      if(dict[n][1][r][0].indexOf("struct") >= 0){
+                        t = r;
+                        break;
+                      }
+                    }
+                    this.cmd("Connect", x[k][3]+1, dict[n][1][t][3]+1);
+                  }
+              }
+          }
       }
     }
 

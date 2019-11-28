@@ -1,4 +1,4 @@
-def cgrammarfunc(inp, var_dict, var_type, counter, flag):
+def cgrammarfunc(inp):
     import ply.lex as lex
     import ply.yacc as yacc
     import json
@@ -6,12 +6,13 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
     import copy
     from secondparser import secondparser
 
-    '''
-    var_dict = {}
+
+    var_dict= [{}]
     var_type = {}
     flag = {"dflag" : 0}
     counter = {"dcount"  :   0}
-    '''
+
+    line_list = []
 
     #tokens list specifying all of the possible tokens
     tokens = [
@@ -171,11 +172,14 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
     '''
 
     precedence = (
+        ('left', 'ARROW'),
+        ('left', 'OR'),
+        ('left', 'AND'),
         ('left', 'EQUAL', 'NOTEQUAL'),
         ('left', 'LESSER', 'LESSEREQ', 'GREATER', 'GREATEREQ'),
         ('left', 'PLUS', 'MINUS'),
         ('left', 'MULT', 'DIVIDE'),
-        ('left', 'LPAREN', 'RPAREN', 'ARROW', 'INCREMENT', 'DECREMENT')
+        ('left', 'LPAREN', 'RPAREN', 'INCREMENT', 'DECREMENT')
     )
 
     def p_primary_expression(p):
@@ -200,6 +204,7 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
+        #line_list.append(var_dict[0])
 
 
     def p_primary_expression1(p):
@@ -227,6 +232,7 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2])
+        #line_list.append(var_dict[0])
 
 
     def p_primary_expression2(p):
@@ -239,14 +245,17 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
             p[0] = str(p[1])
 
 
+
     def p_var_declare_without_assign(p):
         '''
         var_declare	:	INT ID
                     |	FLOAT ID
         '''
-        if(p[2] not in var_dict):
-            var_dict[p[2]] = [p[1]]
-            var_dict[p[2]].insert(1,'?')
+        if(p[2] not in var_dict[0]):
+            var_dict[0][p[2]] = [p[1]]
+            var_dict[0][p[2]].insert(1,'?')
+            print("in declare",var_dict[0])
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_var_declare(p):
@@ -257,9 +266,12 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + " " + str(p[2]) + str(p[3]) + str(p[4])
         else:
-            if(p[2] not in var_dict):
-                var_dict[p[2]] = [p[1]]
-            var_dict[p[2]].insert(1,p[4])
+            #print("var  :",var_dict[0])
+            if(p[2] not in var_dict[0]):
+                var_dict[0][p[2]] = [p[1]]
+            var_dict[0][p[2]].insert(1,p[4])
+            print("in assignment",var_dict[0])
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_var_assign(p):
@@ -268,39 +280,43 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
                     |   ID ASSIGN NULL
 
         '''
+        #global var_dict[0]
+        print("var     :",var_dict[0])
         if(flag["dflag"] == 0):
-            if("*" in var_dict[p[1]][0] and "struct" in var_dict[p[1]][0]):
+            if("*" in var_dict[0][p[1]][0] and "struct" in var_dict[0][p[1]][0]):
                 if(p[3] == "?"):
-                    var_dict[p[1]][1] = "?"
-                elif(p[3] == "NULL" or var_dict[p[3]][1] != "?"):
+                    var_dict[0][p[1]][1] = "?"
+                elif(p[3] == "NULL" or var_dict[0][p[3]][1] != "?"):
                     x = p[3]
-                    while(x != "NULL" and isinstance(var_dict[x][1], str)):
+                    while(x != "NULL" and isinstance(var_dict[0][x][1], str)):
                         print("inside while", x)
-                        x = var_dict[x][1]
+                        x = var_dict[0][x][1]
                     if(x == "NULL"):
-                        var_dict[p[1]][1] = "NULL"
+                        var_dict[0][p[1]][1] = "NULL"
                     else:
-                        var_dict[p[1]][1] = x
+                        var_dict[0][p[1]][1] = x
                 else:
                     print("in else1")
-                    var_dict[p[1]][1] = p[3]
+                    var_dict[0][p[1]][1] = p[3]
 
-            elif("*" in var_dict[p[1]][0]):
-                if(p[3] == "NULL" or var_dict[p[3]][1] != "?"):
+            elif("*" in var_dict[0][p[1]][0]):
+                if(p[3] == "NULL" or var_dict[0][p[3]][1] != "?"):
                     x = p[3]
-                    while(x != "NULL" and isinstance(var_dict[x][1], str)):
-                        if("addr" not in var_dict[x][1] and not(isinstance(var_dict[x][1],dict))):
-                            x = var_dict[x][1]
+                    while(x != "NULL" and isinstance(var_dict[0][x][1], str)):
+                        if("addr" not in var_dict[0][x][1] and not(isinstance(var_dict[0][x][1],dict))):
+                            x = var_dict[0][x][1]
                         else:
                             break
                     if(x == "NULL"):
-                        var_dict[p[1]][1] = "NULL"
+                        var_dict[0][p[1]][1] = "NULL"
                     else:
-                        var_dict[p[1]][1] = var_dict[x][1]
+                        var_dict[0][p[1]][1] = var_dict[0][x][1]
                 else:
-                    var_dict[p[1]][1] = "?"
+                    var_dict[0][p[1]][1] = "?"
             else:
-                var_dict[p[1]][1] = p[3]
+                var_dict[0][p[1]][1] = p[3]
+            print("vardict   ",var_dict[0])
+            line_list.append(copy.deepcopy(var_dict[0]))
         else:
             if(p[3]!= "NULL"):
                 p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -316,8 +332,9 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2])
         else:
-            var_dict[p[3]] = [p[1] + p[2]]
-            var_dict[p[3]].insert(1,'?')
+            var_dict[0][p[3]] = [p[1] + p[2]]
+            var_dict[0][p[3]].insert(1,'?')
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_pointer_assign(p):
@@ -328,7 +345,8 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4])
         else:
-            var_dict[p[1]][1] = "addr" + p[4]
+            var_dict[0][p[1]][1] = "addr" + p[4]
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_pointer_declare(p):
@@ -339,8 +357,9 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4]) + str(p[5]) + str(p[6])
         else:
-            var_dict[p[3]] = [p[1] + p[2]]
-            var_dict[p[3]].insert(1, "addr" + p[6])
+            var_dict[0][p[3]] = [p[1] + p[2]]
+            var_dict[0][p[3]].insert(1, "addr" + p[6])
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_pointer_declare1(p):
@@ -351,20 +370,21 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4]) + str(p[5])
         else:
-            var_dict[p[3]] = [p[1] + p[2]]
-            if(p[5] == "NULL" or var_dict[p[5]][1] != "?"):
+            var_dict[0][p[3]] = [p[1] + p[2]]
+            if(p[5] == "NULL" or var_dict[0][p[5]][1] != "?"):
                 x = p[5]
-                while(x!= "NULL" and isinstance(var_dict[x][1], str)):
-                    if("addr" not in var_dict[x][1] and not(isinstance(var_dict[x][1],dict))):
-                        x = var_dict[x][1]
+                while(x!= "NULL" and isinstance(var_dict[0][x][1], str)):
+                    if("addr" not in var_dict[0][x][1] and not(isinstance(var_dict[0][x][1],dict))):
+                        x = var_dict[0][x][1]
                     else:
                         break
                 if(x == "NULL"):
-                    var_dict[p[3]].insert(1, "NULL")
+                    var_dict[0][p[3]].insert(1, "NULL")
                 else:
-                    var_dict[p[3]].insert(1, var_dict[x][1])
+                    var_dict[0][p[3]].insert(1, var_dict[0][x][1])
             else:
-                var_dict[p[3]].insert(1,"?")
+                var_dict[0][p[3]].insert(1,"?")
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_pointer_init(p):
@@ -374,20 +394,20 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4])
         else:
-            x = var_dict[p[2]][1]
+            x = var_dict[0][p[2]][1]
             if(isinstance(x,str)):
                 if("addr" in x):
                     x = x[4:]
-                    var_dict[x][1] = p[4]
-                elif(isinstance(var_dict[x][1],dict)):
-                    var_dict[x][1][x][1] = p[4]
+                    var_dict[0][x][1] = p[4]
+                elif(isinstance(var_dict[0][x][1],dict)):
+                    var_dict[0][x][1][x][1] = p[4]
                 else:
-                    x = var_dict[x][1]
+                    x = var_dict[0][x][1]
                     x = x[4:]
-                    var_dict[x][1] = p[4]
+                    var_dict[0][x][1] = p[4]
             else:
                 x[p[2]][1] = p[4]
-
+            line_list.append(copy.deepcopy(var_dict[0]))
 
     def p_dynamic(p):
         '''
@@ -400,8 +420,9 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + " " + str(p[3]) + str(p[4]) + str(p[5]) + str(p[6]) + str(p[7]) + str(p[8])
         else:
-            var_dict[p[3]] = [p[1] + "*"]
-            var_dict[p[3]].insert(1,{p[3] : [p[1]+p[2] , "?"]})
+            var_dict[0][p[3]] = [p[1] + "*"]
+            var_dict[0][p[3]].insert(1,{p[3] : [p[1]+p[2] , "?"]})
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_dynamic_init1(p):
@@ -412,7 +433,8 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4]) + str(p[5]) + str(p[6])
         else:
-            var_dict[p[1]][1] = {p[1] : [var_dict[p[1]][0] , "?"]}
+            var_dict[0][p[1]][1] = {p[1] : [var_dict[0][p[1]][0] , "?"]}
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_struct_pointer_declare(p):
@@ -422,8 +444,9 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + " " + str(p[2]) + str(p[3]) + " " + str(p[4])
         else:
-            var_dict[p[4]] = [p[1] + " " + p[2] + p[3]]
-            var_dict[p[4]].insert(1,'?')
+            var_dict[0][p[4]] = [p[1] + " " + p[2] + p[3]]
+            var_dict[0][p[4]].insert(1,'?')
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_struct_pointer_assign(p):
@@ -435,28 +458,31 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + " " + str(p[2]) + str(p[3]) + " " + str(p[4]) + " " + str(p[5]) + " " + str(p[6])
         else:
-            var_dict[p[4]] = [p[1] + " " + p[2] + p[3]]
+            var_dict[0][p[4]] = [p[1] + " " + p[2] + p[3]]
             if(p[6] == "?"):
-                var_dict[p[4]].insert(1,"?")
-            elif(p[6] == "NULL" or var_dict[p[6]][1] != "?"):
+                var_dict[0][p[4]].insert(1,"?")
+            elif(p[6] == "NULL" or var_dict[0][p[6]][1] != "?"):
                 x = p[6]
-                while( x!= "NULL" and isinstance(var_dict[x][1], str)):
-                    x = var_dict[x][1]
+                while( x!= "NULL" and isinstance(var_dict[0][x][1], str)):
+                    x = var_dict[0][x][1]
                 if(x == "NULL"):
-                    var_dict[p[4]].insert(1, "NULL")
+                    var_dict[0][p[4]].insert(1, "NULL")
                 else:
-                    var_dict[p[4]].insert(1, x)
+                    var_dict[0][p[4]].insert(1, x)
             else:
-                var_dict[p[4]].insert(1,p[6])
+                var_dict[0][p[4]].insert(1,p[6])
+            line_list.append(copy.deepcopy(var_dict[0]))
+            print(line_list)
 
 
     def p_struct_pointer_assign_dynamic(p):
         '''
         struct_pointer_assign_dynamic	:	STRUCT ID MULT ID ASSIGN MALLOC LPAREN size2 RPAREN
         '''
-        var_dict[p[4]] = [p[1] + " " + p[2] + p[3]]
+        var_dict[0][p[4]] = [p[1] + " " + p[2] + p[3]]
         tempdict = copy.deepcopy(var_type[p[2]])
-        var_dict[p[4]].insert(1,tempdict)
+        var_dict[0][p[4]].insert(1,tempdict)
+        line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_dynamic_init(p):
@@ -464,15 +490,21 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         dynamic_init :  ID ASSIGN MALLOC LPAREN size2 RPAREN
 
         '''
-        # check if identifier is already present in var_dict which was previously declared with malloc
-        if(p[1] in var_dict and isinstance(var_dict[p[1]][1], dict)):
-            counter["dcount"] += 1
-            var_dict[str(counter["dcount"]) + p[1]] = copy.deepcopy(var_dict[p[1]])
-            for i in var_dict:
-                if(var_dict[i][1] == p[1]):
-                    var_dict[i][1] = str(counter["dcount"]) + p[1]
-        tempdict = copy.deepcopy(var_type[p[5]])
-        var_dict[p[1]][1] = tempdict
+        # check if identifier is already present in var_dict[0] which was previously declared with malloc
+        if(flag["dflag"]):
+            p[0] = str(p[1])+ str(p[2]) + str(p[3]) +str(p[4])  + str(p[5]) + str(p[6])
+        else:
+            if(p[1] in var_dict[0] and isinstance(var_dict[0][p[1]][1], dict)):
+                counter["dcount"] += 1
+                var_dict[0][str(counter["dcount"]) + p[1]] = copy.deepcopy(var_dict[0][p[1]])
+                for i in var_dict[0]:
+                    if(var_dict[0][i][1] == p[1]):
+                        var_dict[0][i][1] = str(counter["dcount"]) + p[1]
+            name = var_dict[0][p[1]][0].strip("struct")
+            name = name.strip("*").strip()
+            tempdict = copy.deepcopy(var_type[name])
+            var_dict[0][p[1]][1] = tempdict
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_struct_assign1(p):
@@ -483,24 +515,27 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4]) + str(p[5])
         else:
-            x = var_dict[p[1]][1]
+            x = var_dict[0][p[1]][1]
             if(x != '?' and x != 'NULL'):
                 if(isinstance(x, dict)):
-                    if(isinstance(p[5], str)):
-                        if(isinstance(var_dict[p[5]][1], dict)):
+                    if(p[5] == 'NULL'):
+                        x[p[3]][1] = p[5]
+                    elif(isinstance(p[5], str)):
+                        if(isinstance(var_dict[0][p[5]][1], dict)):
                             x[p[3]][1] = p[5]
                         else:
-                            x[p[3]][1] = var_dict[p[5]][1]
+                            x[p[3]][1] = var_dict[0][p[5]][1]
                     else:
                         x[p[3]][1] = p[5]
                 else:
                     if(isinstance(p[5], str)):
-                        if(isinstance(var_dict[p[5]][1], dict)):
-                            var_dict[x][1][p[3]][1] = p[5]
+                        if(isinstance(var_dict[0][p[5]][1], dict)):
+                            var_dict[0][x][1][p[3]][1] = p[5]
                         else:
-                            var_dict[x][1][p[3]][1] = var_dict[p[5]][1]
+                            var_dict[0][x][1][p[3]][1] = var_dict[0][p[5]][1]
                     else:
-                        var_dict[x][1][p[3]][1] = p[5]
+                        var_dict[0][x][1][p[3]][1] = p[5]
+            line_list.append(copy.deepcopy(var_dict[0]))
 
 
     def p_size1(p):
@@ -519,7 +554,7 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         size2	:	SIZEOF LPAREN STRUCT ID RPAREN multiplier
         '''
         if(flag["dflag"]):
-            p[0] = str(p[1]) + str(p[2]) + str(p[3]) + str(p[4]) + str(p[5]) + str(p[6])
+            p[0] = str(p[1]) + str(p[2]) + str(p[3]) + " " + str(p[4]) + str(p[5]) + str(p[6])
         else:
             p[0] = p[4]
 
@@ -565,6 +600,7 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
                 var,ty = i.split(':')
                 var_type[p[2]][var] = [ty,'?']
             del det[:]
+        line_list.append(copy.deepcopy(var_dict[0]))
 
     det = []
 
@@ -784,10 +820,10 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = str(p[1])
         else:
-            if("*" in var_dict[p[1]][0]):
+            if("*" in var_dict[0][p[1]][0]):
                 p[0] = p[1]
             else:
-                p[0] = var_dict[p[1]][1]
+                p[0] = var_dict[0][p[1]][1]
         #print("in expression_var", p[0])
 
 
@@ -798,12 +834,13 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
+            print(p[0])
         else:
-            if(isinstance(var_dict[p[1]][1], dict)):
-                p[0] = var_dict[p[1]][1][p[3]][1]
+            if(isinstance(var_dict[0][p[1]][1], dict)):
+                p[0] = var_dict[0][p[1]][1][p[3]][1]
             else:
-                x = var_dict[p[1]][1]
-                p[0] = var_dict[x][1][p[3]][1]
+                x = var_dict[0][p[1]][1]
+                p[0] = var_dict[0][x][1][p[3]][1]
                 print(p[0])
         #print(p[0])
 
@@ -828,45 +865,68 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         if(flag["dflag"]):
             p[0] = ""
 
+    def p_null(p):
+        '''
+        expression	: NULL
+        '''
+        if(flag["dflag"]):
+            p[0] = str(p[1])
+        else:
+            p[0] = p[1]
+
 
     def p_free(p):
         '''
         free : FREE LPAREN ID RPAREN
         '''
-        if(isinstance(var_dict[p[3]][1], dict)):
-            var_dict[p[3]][1] = "?"
-            for i in var_dict:
-                if(var_dict[i][1] == p[3]):
-                    var_dict[i][1] = "?"
+        if(isinstance(var_dict[0][p[3]][1], dict)):
+            var_dict[0][p[3]][1] = "$"
+            for i in var_dict[0]:
+                if(var_dict[0][i][1] == p[3]):
+                    var_dict[0][i][1] = "$"
         else:
-            x = var_dict[p[3]][1]
-            var_dict[p[3]][1] = "?"
-            del var_dict[x]
-            for i in var_dict:
-                if(var_dict[i][1] == x):
-                    var_dict[i][1] = "?"
+            x = var_dict[0][p[3]][1]
+            var_dict[0][p[3]][1] = "?"
+            del var_dict[0][x]
+            for i in var_dict[0]:
+                if(var_dict[0][i][1] == x):
+                    var_dict[0][i][1] = "?"
+        line_list.append(copy.deepcopy(var_dict[0]))
+
 
 
     def myeval(string, local):
         string = string + ";"
-        result = secondparser(string, local, var_type)
+        result = secondparser(string, local, var_type,counter)
         print("result", result[0])
-        return result[0]
+        return result[0][0]
 
 
     def p_while(p):
         '''
         while : seen_a WHILE LPAREN cond RPAREN block
         '''
+        #global var_dict[0]
         loop = dict()
         print("condition as a string", p[4])
-        # create var loop with all elements of var_dict
+        # create var loop with all elements of var_dict[0]
         print("block as a string", p[6])
-        #loop = copy.deepcopy(var_dict)
-        while(myeval(p[4], var_dict)):
+        #loop = copy.deepcopy(var_dict[0])
+
+        #print("1:",var_dict[0])
+        while(myeval(p[4], line_list[-1])):
             # implement block
-            secondparser(p[6], var_dict, var_type)
-            #loop = copy.deepcopy(var_dict)
+            L = secondparser(p[6], line_list[-1], var_type,counter)
+            line_list.extend(copy.deepcopy(L[1]))
+            #print("LINEEEEEE                 ",line_list)
+            #print("in first:", var_dict[0])
+            #loop = copy.deepcopy(var_dict[0])
+        #print(L[1], line_list)
+        #line_list.extend(copy.deepcopy(L[1]))
+
+        var_dict[0] = copy.deepcopy(line_list[-1])
+        #print("outside while vardict:  ",var_dict[0])
+        #print("outside while:  ",line_list)
         flag["dflag"] = 0
 
 
@@ -890,12 +950,12 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         '''
         loop = dict()
         print("cond as a string", p[4])
-        # create var loop with all elements of var_dict
-        #loop = copy.deepcopy(var_dict)
-        if(myeval(p[4], var_dict)):
+        # create var loop with all elements of var_dict[0]
+        #loop = copy.deepcopy(var_dict[0])
+        if(myeval(p[4], var_dict[0])):
             # implement block
-            secondparser(p[6], var_dict, var_type)
-            #loop = copy.deepcopy(var_dict)
+            secondparser(p[6], var_dict[0], var_type,counter)
+            #loop = copy.deepcopy(var_dict[0])
         flag["dflag"] = 0
 
 
@@ -905,12 +965,12 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
         '''
         loop = dict()
         print("cond as a string", p[3])
-        # create var loop with all elements of var_dict
-        if(myeval(p[4], var_dict)):
+        # create var loop with all elements of var_dict[0]
+        if(myeval(p[4], var_dict[0])):
             # implement block
-            secondparser(p[6], var_dict, var_type)
+            secondparser(p[6], var_dict[0], var_type,counter)
         else:
-            secondparser(p[8], var_dict, var_type)
+            secondparser(p[8], var_dict[0], var_type,counter)
         flag["dflag"] = 0
 
 
@@ -928,7 +988,7 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
     #build the parser
     parser = yacc.yacc()
 
-    '''
+    """
     string = ''
     f = open("input.c","r")
     for line in f:
@@ -938,8 +998,10 @@ def cgrammarfunc(inp, var_dict, var_type, counter, flag):
             break
 
     parser.parse(string, lexer = lexer)
-    '''
+    """
 
     parser.parse(inp)
-    print(var_dict)
-    return json.dumps(var_dict)
+    #print("final var:    ",var_dict[0])
+    #print("final:   ",line_list)
+    return line_list
+    #return json.dumps(var_dict[0])

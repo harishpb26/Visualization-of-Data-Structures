@@ -32,14 +32,18 @@ def upload():
 	global complist
 	complist = []
 	input_text.clear()
+
 	f = open("input.c","w")
+	#f.write(text)
+
 	for i in text.split('\n'):
 		if(i.strip()):
-			print(i)
+			#print(i)
 			input_text.append(i)
 			f.write(i + '\n')
-			complist.append(json.loads(cgrammarfunc(i, var_dict, var_type, counter, flag)))
-			print('\n')
+			#complist.extend(json.loads(cgrammarfunc(i, var_dict, var_type, counter, flag)))
+			#print('\n')
+	complist = cgrammarfunc(text)
 	var_dict.clear()
 	var_type.clear()
 	f.close()
@@ -84,7 +88,16 @@ def animek():
 	yvtemp = yvpos
 	#data = {'s': ['struct node*', {'link': ['struct node*', '?'], 'i': ['int', '?']}], 'p': ['int*', {'p': ['int*', 1]}], 'q': ['int*', 'p'], 'r': ['int*', 'p']}
 	temp = {}
+	print("complist : - \n")
 	for data in complist:
+		print("\n")
+		print(data)
+		print("\n")
+	for data in complist:
+		#print("each line:-", data)
+		#print("\n")
+		#print("temp:-", temp)
+		#print("\n")
 		for key in data:
 			if(key in temp):
 				if(isinstance(data[key][1], dict) and isinstance(temp[key][1], str)):
