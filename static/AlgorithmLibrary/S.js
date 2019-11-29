@@ -265,8 +265,15 @@ S.prototype.setup = function(dict){
           // check if it is pointer and its value is defined
           else if(dict[key][0].indexOf("*") >= 0 && dict[key][1] != "?" && dict[key][1]!="$"){
             // k contains the var the pointer points to
-            var k = dict[key][1].substring(4, );
-            this.cmd("Connect", dict[key][3] + 1, dict[k][3] + 1);
+            if(dict[key][1].indexOf("addr") >=0){
+              var k = dict[key][1].substring(4, );
+              this.cmd("Connect", dict[key][3] + 1, dict[k][3] + 1);
+          }
+            else
+            {
+              var k = dict[key][1];
+              this.cmd("Connect", dict[key][3] + 1, dict[k][1][k][3]);
+            }
           }
       }
 

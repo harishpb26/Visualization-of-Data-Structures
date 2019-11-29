@@ -310,7 +310,7 @@ def cgrammarfunc(inp):
                     if(x == "NULL"):
                         var_dict[0][p[1]][1] = "NULL"
                     else:
-                        var_dict[0][p[1]][1] = var_dict[0][x][1]
+                        var_dict[0][p[1]][1] = x
                 else:
                     var_dict[0][p[1]][1] = "?"
             else:
@@ -378,11 +378,13 @@ def cgrammarfunc(inp):
                         x = var_dict[0][x][1]
                     else:
                         break
+                print(x)
                 if(x == "NULL"):
                     var_dict[0][p[3]].insert(1, "NULL")
                 else:
-                    var_dict[0][p[3]].insert(1, var_dict[0][x][1])
+                    var_dict[0][p[3]].insert(1, x)
             else:
+                print("in else")
                 var_dict[0][p[3]].insert(1,"?")
             line_list.append(copy.deepcopy(var_dict[0]))
 
@@ -886,11 +888,12 @@ def cgrammarfunc(inp):
                     var_dict[0][i][1] = "$"
         else:
             x = var_dict[0][p[3]][1]
-            var_dict[0][p[3]][1] = "?"
-            del var_dict[0][x]
+            var_dict[0][p[3]][1] = "$"
+            var_dict[0][x][1] = "$"
+             #del var_dict[0][x]
             for i in var_dict[0]:
                 if(var_dict[0][i][1] == x):
-                    var_dict[0][i][1] = "?"
+                    var_dict[0][i][1] = "$"
         line_list.append(copy.deepcopy(var_dict[0]))
 
 
