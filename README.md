@@ -31,6 +31,7 @@ To clone and run this program, you'll need Git, Python3 and Flask installed on y
 
 ## Example-1
 ![](images/Ex1.PNG)
+
 ![](images/Ex2.PNG)
 
 ## Example-2
@@ -41,9 +42,11 @@ To clone and run this program, you'll need Git, Python3 and Flask installed on y
 
 ## Example-4
 ![](images/Ex5.PNG)
+
 ![](images/Ex6.PNG)
 
 # References
 
 http://www.dabeaz.com/ply
+
 https://github.com/dabeaz/ply
