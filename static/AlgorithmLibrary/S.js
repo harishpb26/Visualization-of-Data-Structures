@@ -35,13 +35,6 @@ var VAR_ELEM_HEIGHT = 50;
 //var VAR_ELEM_HEIGHT = 50;
 
 
-/*
-$.get("/anime", function(data) {
-  dict = $.parseJSON(data);
-  console.log($.parseJSON(data));
-})
-*/
-
 var maindict;
 var req = new XMLHttpRequest();
 req.open('GET','http://127.0.0.1:8080/animek',false);
@@ -70,14 +63,13 @@ S.prototype.init = function(am, w, h)
     S.superclass.init.call(this, am, w, h);
 
     this.addControls();
-    //this.setup();
+    // this.setup();
     // Useful for memory management
     this.nextIndex = 0;
     this.commands = [];
     this.animationManager.resetAll();
     // TODO:  Add any code necessary to set up your own algorithm.  Initialize data
     // structures, etc.
-
 }
 
 S.prototype.addControls =  function()
@@ -99,52 +91,25 @@ S.prototype.reset = function()
     // structures are completely cleaned, and then all of the actions *up to but not including* the
     // last action are then redone.  If you implement all of your actions through the "implementAction"
     // method below, then all of this work is done for you in the Animation "superclass"
-    //maindict = {};
     // Reset the (very simple) memory manager
     this.nextIndex = 0;
 }
-
-/*
-function nextone(){
-    if(count < maindict.length - 1){
-        count++;
-        init();
-        currentAlg.setup(maindict[count]);
-        console.log(count);
-    }
-    else{
-        alert("complete");
-    }
-}
-
-function prevone(){
-    if(count > 0){
-        count--;
-        init();
-        console.log(count);
-        currentAlg.setup(maindict[count]);
-    }
-    else{
-        alert("beginning");
-    }
-}
-*/
-
 
 var count = -1;
 //console.log(maindict.length)
 
 S.prototype.nextone = function(){
-  if(count < maindict.length){
-      this.animationManager.resetAll();
-      currentAlg.setup(maindict[count]);
-      count++;
-      console.log(count,maindict.length,maindict[count]);
-  }
-  else{
-    alert("reached end");
-  }
-  /*
+  // if(count < maindict.length){
+  //     var R = document.getElementsByClassName('each_line');
+  //     this.animationManager.resetAll();
+  //     currentAlg.setup(maindict[count]);
+  //     count++;
+  //     console.log(R.length);
+  // }
+  // else{
+  //   alert("reached end");
+  // }
+
   if(count < maindict.length - 1){
     var R = document.getElementsByClassName('each_line');
     count++;
@@ -152,7 +117,8 @@ S.prototype.nextone = function(){
       {
         R[count-1].style.color = "black";
       }
-      R[count].style.color = "red";
+      if(count >= 0)
+        R[count].style.color = "red";
       //init();
       //currentAlg.reset();
       this.animationManager.resetAll();
@@ -162,7 +128,7 @@ S.prototype.nextone = function(){
   else{
       alert("complete");
   }
-  */
+
 }
 
 S.prototype.prevone = function(){
@@ -202,7 +168,7 @@ S.prototype.setup = function(dict){
           //console.log(/^\d/.test(dict[key][1]));
 
           //draw a rect for a pointer
-          // check if the first char of key is not an integer
+          //check if the first char of key is not an integer
           if(isNaN(key[0])){
             this.cmd("CreateLabel", dict[key][3], key, dict[key][2][0] ,dict[key][2][1]);
 
@@ -235,17 +201,16 @@ S.prototype.setup = function(dict){
         }
     }
 
+    //{'head': ['struct node*', '1newnode', [600, 60], 0],
+    //'newnode': ['struct node*', {'link': ['struct node*', '?', [120, 110], 6],
+    //'data': ['int', '?', [120, 160], 8]}, [600, 160], 2],
+    //'len': ['int', 1, [840, 60], 4],
+    // '1newnode': ['struct node*', {'link': ['struct node*', 'NULL', [120, 310], 10],
+    //'data': ['int', 0, [120, 360], 12]}, [600, 260], 14]}
 
-
-     //{'head': ['struct node*', '1newnode', [600, 60], 0],
-     //'newnode': ['struct node*', {'link': ['struct node*', '?', [120, 110], 6],
-     //'data': ['int', '?', [120, 160], 8]}, [600, 160], 2],
-     //'len': ['int', 1, [840, 60], 4],
-     // '1newnode': ['struct node*', {'link': ['struct node*', 'NULL', [120, 310], 10],
-     //'data': ['int', 0, [120, 360], 12]}, [600, 260], 14]}
     //draw the arrow pointers
     for(key in dict){
-      // if the first element is not an dict and not null
+      //if the first element is not an dict and not null
       if(typeof(dict[key][1]) != "object" && dict[key][1] != "NULL" && dict[key][1]!="$"){
           //console.log(dict[key][3], dict[dict[key][1]][3])
           console.log("in if");
@@ -262,22 +227,23 @@ S.prototype.setup = function(dict){
             //console.log(dict[key][3]+1, x[y][3]);
             this.cmd("Connect", dict[key][3]+1, x[y][3] + 1);
           }
-          // check if it is pointer and its value is defined
+          //check if it is pointer and its value is defined
           else if(dict[key][0].indexOf("*") >= 0 && dict[key][1] != "?" && dict[key][1]!="$"){
-            // k contains the var the pointer points to
+            //k contains the var the pointer points to
             if(dict[key][1].indexOf("addr") >=0){
               var k = dict[key][1].substring(4, );
               this.cmd("Connect", dict[key][3] + 1, dict[k][3] + 1);
-          }
+            }
             else
             {
               var k = dict[key][1];
+              console.log(dict[key], dict[k]);
               this.cmd("Connect", dict[key][3] + 1, dict[k][1][k][3]);
             }
           }
       }
 
-      // if first element is a dict and it not struct but a pointer
+      //if first element is a dict and it not struct but a pointer
       else if(typeof(dict[key][1]) == "object" && dict[key][0].indexOf("*") >= 0 && dict[key][0].indexOf("struct") < 0){
         //console.log("in else if part");
         //if(dict[key][1][key][1] != "NULL" && dict[key][1][key][1] != "?"){
@@ -286,7 +252,7 @@ S.prototype.setup = function(dict){
         //}
       }
 
-      // if the first elem is a dict and its key doesnt start with an int
+      //if the first elem is a dict and its key doesnt start with an int
       else if(typeof(dict[key][1]) == "object" &&  isNaN(key[0])){
       //else if(typeof(dict[key][1]) == "object"){
         for (i in dict[key][1]){

@@ -1,47 +1,20 @@
-// Copyright 2011 David Galles, University of San Francisco. All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-// conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-// of conditions and the following disclaimer in the documentation and/or other materials
-// provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ``AS IS'' AND ANY EXPRESS OR IMPLIED
-// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-// ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// The views and conclusions contained in the software and documentation are those of the
-// authors and should not be interpreted as representing official policies, either expressed
-// or implied, of the University of San Francisco
-
-
 // Object Manager
-//
+
 // Manage all of our animated objects.  Control any animated object should occur through
 // this interface (not language enforced, because enforcing such things in Javascript is
 // problematic.)
-//
+
 // This class is only accessed through:
-//
+
 //  AnimationMain
 //  Undo objects (which are themselves controlled by AnimationMain
-
 
 // TODO:
 //       1.  Add proper throws for all error conditions (perhaps guarded by
 //           an assert-like structure that can be turned off for production?)
 //       2.  Refactor this code so that it uses the same object syntax (with
 //           prototypes) as te rest of the code.  (low priority)
+
 function ObjectManager()
 {
 	this.Nodes = [];
@@ -53,7 +26,7 @@ function ObjectManager()
 	this.framenum = 0;
 	this.width = 0;
 	this.height = 0;
-	this.statusReport = new AnimatedLabel(-1, "XXX", false, 30);
+	this.statusReport = new AnimatedLabel(-1, "", false, 30);
 	this.statusReport.x = 30;
 
 	this.draw = function()
@@ -74,6 +47,7 @@ function ObjectManager()
 				this.Nodes[i].draw(this.ctx);
 			}
 		}
+
 		for (i = 0; i < this.Nodes.length; i++)
 		{
 			if (this.Nodes[i] != null && (this.Nodes[i].highlighted && !this.Nodes[i].alwaysOnTop) && this.Nodes[i].addedToScene)
@@ -92,7 +66,6 @@ function ObjectManager()
 			}
 		}
 
-
 		for (i = 0; i < this.Edges.length; i++)
 		{
 			if (this.Edges[i] != null)
@@ -104,21 +77,16 @@ function ObjectManager()
 						this.Edges[i][j].pulseHighlight(this.framenum);
 						this.Edges[i][j].draw(this.ctx);
 					}
-
 				}
-
 			}
 		}
 		this.statusReport.draw(this.ctx);
-
 	}
 
 	this.update = function ()
 	{
 
-
 	}
-
 
 	this.setLayers = function(shown,layers)
 	{
@@ -127,7 +95,6 @@ function ObjectManager()
 			this.activeLayers[layers[i]] = shown;
 		}
 		this.resetLayers();
-
 	}
 
 
@@ -160,7 +127,6 @@ function ObjectManager()
 			}
 		}
 		return oldAlpha;
-
 	}
 
 	this.setAlpha = function(nodeID, alphaVal)
@@ -193,7 +159,6 @@ function ObjectManager()
 		{
 			return "#000000";
 		}
-
 	}
 
 	this.setTextColor = function(nodeID, color, index)
@@ -204,7 +169,6 @@ function ObjectManager()
 		}
 	}
 
-
 	this.setHighlightIndex = function(nodeID, index)
 	{
 		if (this.Nodes[nodeID] != null && this.Nodes[nodeID] != undefined)
@@ -212,10 +176,6 @@ function ObjectManager()
 			this.Nodes[nodeID].setHighlightIndex(index);
 		}
 	}
-
-
-
-
 
 	this.setAllLayers = function(layers)
 	{
@@ -249,16 +209,10 @@ function ObjectManager()
 								this.activeLayers[this.Edges[i][j].Node1.layer] == true &&
 								this.activeLayers[this.Edges[i][j].Node2.layer] == true;
 					}
-
 				}
-
 			}
-
 		}
-
 	}
-
-
 
 	this.setLayer = function(objectID, layer)
 	{
@@ -295,7 +249,6 @@ function ObjectManager()
 					{
 						nextEdge.addedToScene = ((nextEdge.Node1.addedToScene) &&
 												 (nextEdge.Node2.addedToScene));
-
 					}
 				}
 			}
@@ -308,7 +261,6 @@ function ObjectManager()
 		this.Edges = [];
 		this.BackEdges = [];
 	}
-
 
 	this.setForegroundColor = function(objectID, color)
 	{
@@ -338,7 +290,6 @@ function ObjectManager()
 		this.Nodes[nodeID].setHighlight(val);
 	}
 
-
 	this.getHighlight = function(nodeID)
 	{
 		if (this.Nodes[nodeID] == null  || this.Nodes[nodeID] == undefined)
@@ -348,7 +299,6 @@ function ObjectManager()
 		}
 		return this.Nodes[nodeID].getHighlight();
 	}
-
 
 	this.getHighlightIndex = function(nodeID)
 	{
@@ -379,7 +329,6 @@ function ObjectManager()
 		}
 		this.Nodes[nodeID].setHeight(val);
 	}
-
 
 	this.getHeight = function(nodeID)
 	{
@@ -425,7 +374,6 @@ function ObjectManager()
 		}
 	}
 
-
 	this.disconnect = function(objectIDfrom,objectIDto)
 	{
 		var undo = null;
@@ -445,6 +393,7 @@ function ObjectManager()
 				}
 			}
 		}
+
 		if (this.BackEdges[objectIDto] != null)
 		{
 			len = this.BackEdges[objectIDto].length;
@@ -514,7 +463,6 @@ function ObjectManager()
 		return undoStack;
 	}
 
-
 	this.removeObject = function(ObjectID)
 	{
 		var OldObject = this.Nodes[ObjectID];
@@ -535,9 +483,7 @@ function ObjectManager()
 			throw "getObject:Object with ID (" + String(objectID) + ") does not exist"
 		}
 		return this.Nodes[objectID];
-
 	}
-
 
 	this.addCircleObject = function (objectID, objectLabel)
 	{
@@ -579,7 +525,6 @@ function ObjectManager()
 				width = Math.max(width, this.ctx.measureText(strList[i]).width);
 			}
 		}
-
 		return width;
 	}
 
@@ -591,7 +536,6 @@ function ObjectManager()
 			throw "setting text of an object that does not exit";
 		}
 		this.Nodes[nodeID].setText(text, index, this.getTextWidth(text));
-
 	}
 
 	this.getText = function(nodeID, index)
@@ -601,7 +545,6 @@ function ObjectManager()
 			throw "getting text of an object that does not exit";
 		}
 		return this.Nodes[nodeID].getText(index);
-
 	}
 
 	this.getNodeY = function(nodeID)
@@ -612,7 +555,6 @@ function ObjectManager()
 		}
 		return this.Nodes[nodeID].y;
 	}
-
 
 	this.connectEdge = function(objectIDfrom, objectIDto, color, curve, directed, lab, connectionPoint)
 	{
@@ -634,9 +576,7 @@ function ObjectManager()
 		l.addedToScene = fromObj.addedToScene && toObj.addedToScene;
 		this.Edges[objectIDfrom].push(l);
 		this.BackEdges[objectIDto].push(l);
-
 	}
-
 
 	this.setNull = function(objectID, nullVal)
 	{
@@ -655,8 +595,6 @@ function ObjectManager()
 		}
 		return false;  // TODO:  Error here?
 	}
-
-
 
 	this.setEdgeColor = function(fromID, toID, color) // returns old color
 	{
@@ -709,8 +647,6 @@ function ObjectManager()
 		this.Nodes[id1].alignRight(this.Nodes[id2]);
 	}
 
-
-
 	this.getAlignRightPos = function(id1, id2)
 	{
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
@@ -731,8 +667,6 @@ function ObjectManager()
 	        return this.Nodes[id1].getAlignLeftPos(this.Nodes[id2]);
 	}
 
-
-
 	this.alignBottom = function(id1, id2)
 	{
 		if (this.Nodes[id1] == null || this.Nodes[id1] == undefined ||
@@ -742,7 +676,6 @@ function ObjectManager()
 		}
 		this.Nodes[id1].alignBottom(this.Nodes[id2]);
 	}
-
 
 	this.setEdgeHighlight = function(fromID, toID, val) // returns old color
 	{
@@ -764,6 +697,7 @@ function ObjectManager()
 		}
 		return oldHighlight;
 	}
+
 	this.addLabelObject = function(objectID, objectLabel, centering)
 	{
 		if (this.Nodes[objectID] != null && this.Nodes[objectID] != undefined)
@@ -774,7 +708,6 @@ function ObjectManager()
 		var newLabel = new AnimatedLabel(objectID, objectLabel, centering, this.getTextWidth(objectLabel));
 		this.Nodes[objectID] = newLabel;
 	}
-
 
 	this.addLinkedListObject = function(objectID, nodeLabel, width, height, linkPer, verticalOrientation, linkPosEnd, numLabels, backgroundColor, foregroundColor)
 	{
@@ -787,12 +720,10 @@ function ObjectManager()
 		this.Nodes[objectID] = newNode;
 	}
 
-
 	this.getNumElements = function(objectID)
 	{
 		return this.Nodes[objectID].getNumElements();
 	}
-
 
 	this.setNumElements = function(objectID, numElems)
 	{
@@ -824,9 +755,6 @@ function ObjectManager()
 
 	 }
 
-
-
-
 	this.setNodePosition = function(nodeID, newX, newY)
 	{
 		if (this.Nodes[nodeID] == null || this.Nodes[nodeID] == undefined)
@@ -844,7 +772,5 @@ function ObjectManager()
 		/* Don't need to dirty anything, since we repaint everything every frame
 		 (TODO:  Revisit if we do conditional redraws)
 		 }*/
-
 	}
-
 }

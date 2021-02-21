@@ -204,7 +204,6 @@ def cgrammarfunc(inp):
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
-        #line_list.append(var_dict[0])
 
 
     def p_primary_expression1(p):
@@ -245,7 +244,6 @@ def cgrammarfunc(inp):
             p[0] = str(p[1])
 
 
-
     def p_var_declare_without_assign(p):
         '''
         var_declare	:	INT ID
@@ -254,7 +252,7 @@ def cgrammarfunc(inp):
         if(p[2] not in var_dict[0]):
             var_dict[0][p[2]] = [p[1]]
             var_dict[0][p[2]].insert(1,'?')
-            print("in declare",var_dict[0])
+            #print("in declare",var_dict[0])
             line_list.append(copy.deepcopy(var_dict[0]))
 
 
@@ -270,7 +268,7 @@ def cgrammarfunc(inp):
             if(p[2] not in var_dict[0]):
                 var_dict[0][p[2]] = [p[1]]
             var_dict[0][p[2]].insert(1,p[4])
-            print("in assignment",var_dict[0])
+            #print("in assignment",var_dict[0])
             line_list.append(copy.deepcopy(var_dict[0]))
 
 
@@ -281,7 +279,7 @@ def cgrammarfunc(inp):
 
         '''
         #global var_dict[0]
-        print("var     :",var_dict[0])
+        #print("var     :",var_dict[0])
         if(flag["dflag"] == 0):
             if("*" in var_dict[0][p[1]][0] and "struct" in var_dict[0][p[1]][0]):
                 if(p[3] == "?"):
@@ -315,7 +313,7 @@ def cgrammarfunc(inp):
                     var_dict[0][p[1]][1] = "?"
             else:
                 var_dict[0][p[1]][1] = p[3]
-            print("vardict   ",var_dict[0])
+            #print("vardict   ",var_dict[0])
             line_list.append(copy.deepcopy(var_dict[0]))
         else:
             if(p[3]!= "NULL"):
@@ -410,6 +408,7 @@ def cgrammarfunc(inp):
             else:
                 x[p[2]][1] = p[4]
             line_list.append(copy.deepcopy(var_dict[0]))
+
 
     def p_dynamic(p):
         '''
@@ -657,7 +656,6 @@ def cgrammarfunc(inp):
     def p_expression_plus(p):
         '''
         expression	:	expression PLUS expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -669,7 +667,6 @@ def cgrammarfunc(inp):
     def p_expression_divide(p):
         '''
         expression	:	expression DIVIDE expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -680,7 +677,6 @@ def cgrammarfunc(inp):
     def p_expression_minus(p):
         '''
         expression	:	expression MINUS expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -691,7 +687,6 @@ def cgrammarfunc(inp):
     def p_expression_lesser(p):
         '''
         expression	:	expression LESSER expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -705,7 +700,6 @@ def cgrammarfunc(inp):
     def p_expression_greater(p):
         '''
         expression	:	expression GREATER expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -719,7 +713,6 @@ def cgrammarfunc(inp):
     def p_expression_greatereq(p):
         '''
         expression	:	expression GREATEREQ expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -733,7 +726,6 @@ def cgrammarfunc(inp):
     def p_expression_lessereq(p):
         '''
         expression	:	expression LESSEREQ expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -747,7 +739,6 @@ def cgrammarfunc(inp):
     def p_expression_equal(p):
         '''
         expression	:	expression EQUAL expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -761,7 +752,6 @@ def cgrammarfunc(inp):
     def p_expression_notequal(p):
         '''
         expression	:	expression NOTEQUAL expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -775,7 +765,6 @@ def cgrammarfunc(inp):
     def p_expression_and(p):
         '''
         expression	:	expression AND expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -789,7 +778,6 @@ def cgrammarfunc(inp):
     def p_expression_or(p):
         '''
         expression	:	expression OR expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -803,7 +791,6 @@ def cgrammarfunc(inp):
     def p_expression_not(p):
         '''
         expression	:	NOT expression
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2])
@@ -817,7 +804,6 @@ def cgrammarfunc(inp):
     def p_expression_var(p):
         '''
         expression	:	ID
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1])
@@ -832,7 +818,6 @@ def cgrammarfunc(inp):
     def p_expression_structvar(p):
         '''
         expression	:	ID ARROW ID
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1]) + str(p[2]) + str(p[3])
@@ -851,7 +836,6 @@ def cgrammarfunc(inp):
         '''
         expression	:	NUMINT
                     |   NUMFLOAT
-
         '''
         if(flag["dflag"]):
             p[0] = str(p[1])
@@ -866,6 +850,7 @@ def cgrammarfunc(inp):
         '''
         if(flag["dflag"]):
             p[0] = ""
+
 
     def p_null(p):
         '''
@@ -895,7 +880,6 @@ def cgrammarfunc(inp):
                 if(var_dict[0][i][1] == x):
                     var_dict[0][i][1] = "$"
         line_list.append(copy.deepcopy(var_dict[0]))
-
 
 
     def myeval(string, local):
@@ -955,10 +939,11 @@ def cgrammarfunc(inp):
         print("cond as a string", p[4])
         # create var loop with all elements of var_dict[0]
         #loop = copy.deepcopy(var_dict[0])
-        if(myeval(p[4], var_dict[0])):
+        if(myeval(p[4], line_list[-1])):
             # implement block
-            secondparser(p[6], var_dict[0], var_type,counter)
-            #loop = copy.deepcopy(var_dict[0])
+            #secondparser(p[6], var_dict[0], var_type,counter)
+            L = secondparser(p[6], line_list[-1], var_type,counter)
+            line_list.extend(copy.deepcopy(L[1]))
         flag["dflag"] = 0
 
 
@@ -969,13 +954,14 @@ def cgrammarfunc(inp):
         loop = dict()
         print("cond as a string", p[3])
         # create var loop with all elements of var_dict[0]
-        if(myeval(p[4], var_dict[0])):
+        if(myeval(p[4], line_list[-1])):
             # implement block
-            secondparser(p[6], var_dict[0], var_type,counter)
+            L = secondparser(p[6], line_list[-1], var_type,counter)
+            line_list.extend(copy.deepcopy(L[1]))
         else:
-            secondparser(p[8], var_dict[0], var_type,counter)
+            L = secondparser(p[8], line_list[-1], var_type,counter)
+            line_list.extend(copy.deepcopy(L[1]))
         flag["dflag"] = 0
-
 
     def p_cond(p):
         '''

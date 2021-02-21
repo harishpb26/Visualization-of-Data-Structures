@@ -1,13 +1,44 @@
 {% extends "layout.html" %}
 {% block title %}
-	Home Page
+	Home
 {% endblock title %}
+{% block headtitle %}
+	Visualization of Data Structures
+{% endblock headtitle %}
 {% block content %}
-	<h1>Home Page</h1>
-	<form id = "upload_form" method = "POST">
-		<textarea name="insert_code" rows="20" cols="80"></textarea>
-		<!--<input name = "insert_code" type = "text" height = "100">-->
-		<br>
-		<input type = "submit" name = "submit">
-	</form>
+	<section id="banner">
+			<div class="row">
+				<div class="col-md-6 text-center">
+					<div class="about-section">
+						<p class="promo-section">
+							This tool takes body of main method in 'C' as the input from the user
+							and does computations on it and finally creates animation of the
+							respective data structures as well as the code.
+						</p>
+						<img src = "{{ url_for('static', filename = 'images/example.png')}}" width=95% />
+						<p class = "example-section text-left">
+							struct node { <br> &emsp; struct node* next; <br> &emsp; float data; <br>}; <br>
+							struct node* head = malloc(sizeof(struct node)); <br>
+							head->data = 3.14;<br>
+							int var = 0;<br>
+							int* pointerVar = &var;<br>
+						</p>
+						<p class = "promo-section">
+							<b>
+								Check out the tool to get started!
+							</b>
+						</p>
+					</div>
+				</div>
+
+				<div class="col-md-6 text-center">
+					<div class="container">
+						<form id = "upload_form" method = "POST">
+							<textarea name="insert_code" rows="20" cols="80"></textarea>
+							<input class = "myform-btn" type = "submit" name = "Submit">
+						</form>
+					</div>
+				</div>
+			</div>
+	</section>
 {% endblock content %}

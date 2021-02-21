@@ -44,22 +44,14 @@ def upload():
 			#complist.extend(json.loads(cgrammarfunc(i, var_dict, var_type, counter, flag)))
 			#print('\n')
 	complist = cgrammarfunc(text)
+	print("list of dictionaries :-")
+	print("\n")
+	print(complist)
+	print("\n")
 	var_dict.clear()
 	var_type.clear()
 	f.close()
-
-	'''
-	p = subprocess.run(["python","cgrammar.py"],stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE,check = True)
-	p = subprocess.Popen(['python','cgrammar.py'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-	p = subprocess.check_output(['python','cgrammar.py'])
-	stdout, stderr = p.communicate()
-	#rc = p.returncode
-	print(p,type(p))
-	my_json = stdout.decode("utf8").replace("'",'"')
-	print(my_json)
-	#return json.dumps(my_json)
-	'''
-	return render_template('about.html')
+	return render_template('S.html', text = input_text)
 
 
 @app.route('/anime')
@@ -88,11 +80,6 @@ def animek():
 	yvtemp = yvpos
 	#data = {'s': ['struct node*', {'link': ['struct node*', '?'], 'i': ['int', '?']}], 'p': ['int*', {'p': ['int*', 1]}], 'q': ['int*', 'p'], 'r': ['int*', 'p']}
 	temp = {}
-	print("complist : - \n")
-	for data in complist:
-		print("\n")
-		print(data)
-		print("\n")
 	for data in complist:
 		#print("each line:-", data)
 		#print("\n")
@@ -151,18 +138,16 @@ def animek():
 					data[key].insert(3, iter)
 					iter += 2
 				temp[key] = data[key]
+	print("list of updated dictionaries")
+	print("\n")
 	print(complist)
+	print("\n")
 	return json.dumps(complist)
 
 
-@app.route('/QueueArray')
-def QueueArray():
-	return render_template('QueueArray.html')
-
-
-@app.route('/Structure')
-def Structure():
-	return render_template('S.html',text = input_text)
+# @app.route('/Structure')
+# def Structure():
+# 	return render_template('S.html', text = input_text)
 
 
 if __name__ == '__main__':
